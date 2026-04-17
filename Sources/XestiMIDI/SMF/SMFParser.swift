@@ -23,6 +23,9 @@ extension SMFParser {
     /// - Parameter data:   The raw binary data to parse.
     ///
     /// - Returns:  The decoded ``SMFSequence``.
+    ///
+    /// - Throws:   ``SMFParseError`` if the data cannot be parsed as a valid
+    ///             SMF sequence.
     public func parse(_ data: Data) throws -> SMFSequence {
         var reader = Reader(data: data)
 

@@ -23,6 +23,8 @@ extension SMFFormatter {
     /// - Parameter sequence:   The SMF sequence to encode.
     ///
     /// - Returns:  The encoded data.
+    ///
+    /// - Throws:   ``SMFFormatError`` if the sequence cannot be encoded.
     public func format(_ sequence: SMFSequence) throws -> Data {
         var writer = Writer(sequence: sequence)
 
