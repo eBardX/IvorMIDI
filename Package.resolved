@@ -1,5 +1,5 @@
 {
-  "originHash" : "18d94ba75c9cdc512dd472705bbce8f0c5319aa89850efccfdcfdf50dc27860d",
+  "originHash" : "f2b193509327befdcb6f85c329ef2e683c16a988fcf7a2968d79ebffaabaf8a2",
   "pins" : [
     {
       "identity" : "swift-argument-parser",
@@ -11,30 +11,12 @@
       }
     },
     {
-      "identity" : "swift-docc-plugin",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-docc-plugin.git",
-      "state" : {
-        "revision" : "647c708be89f834fa6a6d4945442793a77ddf5b6",
-        "version" : "1.5.0"
-      }
-    },
-    {
-      "identity" : "swift-docc-symbolkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
-      "state" : {
-        "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
-        "version" : "1.0.0"
-      }
-    },
-    {
       "identity" : "xestitext",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/eBardX/XestiText.git",
       "state" : {
-        "revision" : "44f48ae8b0573a4880e772840a116592f6d4f3d0",
-        "version" : "4.0.3"
+        "revision" : "a7eb4d59c0309e91e3a4680c9e7f87765b003217",
+        "version" : "4.0.4"
       }
     },
     {
@@ -42,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/eBardX/XestiTools.git",
       "state" : {
-        "revision" : "1c619962cf024f994be792ca81d5e0f947c29039",
-        "version" : "7.4.0"
+        "revision" : "ca57209e8adf03b22828c9c8d169ce70a845c573",
+        "version" : "7.4.1"
       }
     },
     {
