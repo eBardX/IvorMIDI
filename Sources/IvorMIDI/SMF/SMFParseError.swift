@@ -62,10 +62,12 @@ public enum SMFParseError {
 // MARK: - EnhancedError
 
 extension SMFParseError: EnhancedError {
+    /// Returns the error category identifying the source module.
     public var category: Category? {
         Category("IvorMIDI")
     }
 
+    /// Returns a human-readable description of this error.
     public var message: String {
         switch self {
         case .dataExhaustedPrematurely:
