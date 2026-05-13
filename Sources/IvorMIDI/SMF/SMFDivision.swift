@@ -4,11 +4,10 @@
 /// measured.
 public enum SMFDivision {
 
-    /// Metrical (tick-based) time division, measured in ticks per quarter
-    /// note.
+    /// Metrical (tick-based) time division, measured in ticks per quarter note.
     case metrical(SMFTickRate)
 
-    /// SMPTE time code-based time division.
+    /// SMPTE timecode-based time division.
     case timeCode(SMPTETimeCode)
 }
 
@@ -18,8 +17,8 @@ extension SMFDivision: BytesValueConvertible {
 
     // MARK: Public Initializers
 
-    /// Creates an `SMFDivision` instance from the provided array of bytes,
-    /// or `nil` if the bytes do not represent a valid time division.
+    /// Creates an `SMFDivision` instance from the provided array of bytes, or
+    /// `nil` if the bytes do not represent a valid time division.
     ///
     /// - Parameter bytesValue: The array of bytes. Must contain exactly two
     ///                         bytes.
@@ -42,8 +41,8 @@ extension SMFDivision: BytesValueConvertible {
 
     // MARK: Public Instance Properties
 
-    /// The array of two bytes representing this time division, or `nil` if
-    /// the division cannot be encoded.
+    /// The array of two bytes representing this time division, or `nil` if the
+    /// division cannot be encoded.
     public var bytesValue: [UInt8]? {
         switch self {
         case let .metrical(tickRate):

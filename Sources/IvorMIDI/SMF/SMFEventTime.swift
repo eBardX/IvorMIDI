@@ -2,8 +2,8 @@
 
 public import XestiTools
 
-/// The absolute time of an SMF event, measured in ticks from the
-/// beginning of the track.
+/// The absolute time of an SMF event, measured in ticks from the beginning of
+/// the track.
 public struct SMFEventTime: UIntRepresentable {
 
     // MARK: Public Type Properties
@@ -13,21 +13,21 @@ public struct SMFEventTime: UIntRepresentable {
 
     // MARK: Public Type Methods
 
-    /// Returns a Boolean value indicating whether the provided value is a
-    /// valid SMF event time.
+    /// Returns a Boolean value indicating whether the provided value is a valid
+    /// SMF event time.
     ///
     /// - Parameter uintValue:  The value to validate.
     ///
-    /// - Returns:  `true` if the value is in the range 0–0x7fffffff;
-    ///             otherwise, `false`.
+    /// - Returns:  `true` if the value is in the range 0–0x7fffffff; otherwise,
+    ///             `false`.
     public static func isValid(_ uintValue: UInt) -> Bool {
         (0...0x7fffffff).contains(uintValue)
     }
 
     // MARK: Public Initializers
 
-    /// Creates an `SMFEventTime` instance with the provided tick count,
-    /// or `nil` if the value is not in the valid range.
+    /// Creates an `SMFEventTime` instance with the provided tick count, or
+    /// `nil` if the value is not in the valid range.
     ///
     /// - Parameter uintValue:  The tick count. Must be in the range
     ///                         0–0x7fffffff.
@@ -50,8 +50,7 @@ extension SMFEventTime {
 
     // MARK: Public Instance Methods
 
-    /// Returns this event time expressed in beats for the provided tick
-    /// rate.
+    /// Returns this event time expressed in beats for the provided tick rate.
     ///
     /// - Parameter tickRate:   The tick rate (ticks per quarter note).
     ///
@@ -60,10 +59,10 @@ extension SMFEventTime {
         Double(uintValue) / Double(tickRate.uintValue)
     }
 
-    /// Returns this event time expressed as a SMPTE timecode value for
-    /// the provided time code specification.
+    /// Returns this event time expressed as a SMPTE timecode value for the
+    /// provided timecode specification.
     ///
-    /// - Parameter timeCode:   The SMPTE time code specification.
+    /// - Parameter timeCode:   The SMPTE timecode specification.
     ///
     /// - Returns:  The corresponding ``SMPTETime`` value.
     public func smpteTime(_ timeCode: SMPTETimeCode) -> SMPTETime {

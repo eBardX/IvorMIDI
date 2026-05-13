@@ -1,13 +1,13 @@
 // © 2025–2026 John Gary Pusey (see LICENSE.md)
 
-/// A SMPTE time code specification used as an SMF time division,
-/// combining a frame rate and a tick resolution.
+/// A SMPTE timecode specification used as an SMF time division, combining a
+/// frame rate and a tick resolution.
 public struct SMPTETimeCode {
 
     // MARK: Public Initializers
 
-    /// Creates a new `SMPTETimeCode` instance with the provided frame rate
-    /// and tick rate, or `nil` if the tick rate is out of range.
+    /// Creates a new `SMPTETimeCode` instance with the provided frame rate and
+    /// tick rate, or `nil` if the tick rate is out of range.
     ///
     /// - Parameter frameRate:  The SMPTE frame rate.
     /// - Parameter tickRate:   The number of ticks per frame (0–255).
@@ -35,13 +35,13 @@ extension SMPTETimeCode: BytesValueConvertible {
 
     // MARK: Public Initializers
 
-    /// Creates an `SMPTETimeCode` instance from the provided array of
-    /// bytes, or `nil` if the bytes do not represent a valid SMPTE time
-    /// code specification.
+    /// Creates an `SMPTETimeCode` instance from the provided array of bytes, or
+    /// `nil` if the bytes do not represent a valid SMPTE timecode
+    /// specification.
     ///
     /// - Parameter bytesValue: The array of bytes. Must contain exactly two
-    ///                         bytes: the encoded frame rate byte and the
-    ///                         tick rate byte.
+    ///                         bytes: the encoded frame rate byte and the tick
+    ///                         rate byte.
     public init?(bytesValue: [UInt8]) {
         guard bytesValue.count == 2,
               let frameRate = Self._convertToFrameRate(bytesValue[0])
@@ -53,7 +53,7 @@ extension SMPTETimeCode: BytesValueConvertible {
 
     // MARK: Public Instance Properties
 
-    /// The array of two bytes representing this SMPTE time code
+    /// The array of two bytes representing this SMPTE timecode
     /// specification, or `nil` if the value cannot be encoded.
     public var bytesValue: [UInt8]? {
         guard let byte0Value = Self._convertToByteValue(frameRate),
