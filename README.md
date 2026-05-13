@@ -22,4 +22,4 @@ IvorMIDI is available under [the MIT license][license].
 
 [docc]:     https://www.swift.org/documentation/docc/
 [license]:  https://github.com/eBardX/IvorMIDI/blob/main/LICENSE.md
-[refdoc]:   https://eBardX.github.io/IvorMIDI/documentation/IvorMIDI
+[refdoc]:   https://eBardX.github.io/ivor-packages-docs/documentation/ivormidi
