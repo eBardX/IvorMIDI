@@ -24,8 +24,8 @@ extension SMFEvent {
     public var eventTime: SMFEventTime {
         switch self {
         case let .meta(eventTime, _),
-            let .midi(eventTime, _),
-            let .sysEx(eventTime, _):
+             let .midi(eventTime, _),
+             let .sysEx(eventTime, _):
             eventTime
         }
     }

@@ -119,13 +119,13 @@ extension MIDISystemMessage {
     public var dataBytes: [UInt8]? {
         switch self {
         case .activeSensing,
-                .continue,
-                .eox,
-                .start,
-                .stop,
-                .systemReset,
-                .timingClock,
-                .tuneRequest:
+             .continue,
+             .eox,
+             .start,
+             .stop,
+             .systemReset,
+             .timingClock,
+             .tuneRequest:
             []
 
         case let .mtcQuarterFrame(value):

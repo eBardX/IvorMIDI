@@ -296,8 +296,8 @@ extension SMFParser.Reader {
 
         let trackCount = UInt(byte0Value) << 8 | UInt(byte1Value)
 
-        guard (format == .format0 && trackCount == 1) ||
-              (format != .format0 && (1...0x7fff).contains(trackCount))
+        guard (format == .format0 && trackCount == 1)
+              || (format != .format0 && (1...0x7fff).contains(trackCount))
         else { throw SMFParseError.invalidTrackCount(trackCount, format) }
 
         return trackCount

@@ -145,14 +145,14 @@ extension SMFMetaMessage {
     public var dataBytes: [UInt8]? {
         switch self {
         case let .copyright(text),
-            let .cuePoint(text),
-            let .deviceName(text),
-            let .instrumentName(text),
-            let .lyric(text),
-            let .marker(text),
-            let .programName(text),
-            let .sequenceTrackName(text),
-            let .text(text):
+             let .cuePoint(text),
+             let .deviceName(text),
+             let .instrumentName(text),
+             let .lyric(text),
+             let .marker(text),
+             let .programName(text),
+             let .sequenceTrackName(text),
+             let .text(text):
             text.bytesValue
 
         case .endOfTrack:

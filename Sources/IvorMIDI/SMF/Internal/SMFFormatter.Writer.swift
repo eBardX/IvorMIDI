@@ -169,8 +169,8 @@ extension SMFFormatter.Writer {
         guard let fmtBytes = format.bytesValue
         else { throw SMFFormatError.badFormat(format) }
 
-        guard (format == .format0 && trackCount == 1) ||
-              (format != .format0 && (1...0x7fff).contains(trackCount))
+        guard (format == .format0 && trackCount == 1)
+              || (format != .format0 && (1...0x7fff).contains(trackCount))
         else { throw SMFFormatError.badTrackCount(trackCount) }
 
         guard let divBytes = division.bytesValue
