@@ -78,6 +78,20 @@ extension SMFFormatterTests {
     }
 
     @Test
+    func format_highTrackCount_encodedCorrectly() throws {
+        let track = SMFTrack(events: [])
+        let tracks = Array(repeating: track, count: 0x8000)
+        let tickRate = SMFTickRate(uintValue: 480)!                 // swiftlint:disable:this force_unwrapping
+        let sequence = SMFSequence(format: .format1,
+                                   division: .metrical(tickRate),
+                                   tracks: tracks)
+        let data = try SMFFormatter().format(sequence)
+
+        #expect(data[10] == 0x80)
+        #expect(data[11] == 0x00)
+    }
+
+    @Test
     func format_roundTrip() throws {
         let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
         let noteOn = MIDIChannelMessage(statusByte: 0x90,

@@ -63,7 +63,7 @@ extension SMFFormatter.Writer {
     }
 
     private mutating func _writeAsWord(_ value: UInt) throws {
-        guard (0...0x7fff).contains(value)
+        guard (0...0xffff).contains(value)
         else { throw SMFFormatError.badWord(value) }
 
         try _writeAsByte(value >> 8)
@@ -170,7 +170,7 @@ extension SMFFormatter.Writer {
         else { throw SMFFormatError.badFormat(format) }
 
         guard (format == .format0 && trackCount == 1)
-              || (format != .format0 && (1...0x7fff).contains(trackCount))
+              || (format != .format0 && (1...0xffff).contains(trackCount))
         else { throw SMFFormatError.badTrackCount(trackCount) }
 
         guard let divBytes = division.bytesValue

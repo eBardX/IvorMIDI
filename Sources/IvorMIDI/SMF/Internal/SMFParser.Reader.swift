@@ -216,10 +216,9 @@ extension SMFParser.Reader {
         let count = try _readVarlen()
         let dataBytes = try _readBytes(count)
 
-        guard let message = SMFMetaMessage(statusByte: statusByte,
-                                           typeByte: typeByte,
-                                           dataBytes: dataBytes)
-        else { throw SMFParseError.invalidMetaMessage(statusByte, typeByte, dataBytes) }
+        let message = SMFMetaMessage(statusByte: statusByte,
+                                     typeByte: typeByte,
+                                     dataBytes: dataBytes) ?? .unknown(typeByte, dataBytes)
 
         runningStatus = 0
 
@@ -297,7 +296,7 @@ extension SMFParser.Reader {
         let trackCount = UInt(byte0Value) << 8 | UInt(byte1Value)
 
         guard (format == .format0 && trackCount == 1)
-              || (format != .format0 && (1...0x7fff).contains(trackCount))
+                || (format != .format0 && (1...0xffff).contains(trackCount))
         else { throw SMFParseError.invalidTrackCount(trackCount, format) }
 
         return trackCount

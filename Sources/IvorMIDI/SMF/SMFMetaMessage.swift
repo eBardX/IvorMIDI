@@ -36,6 +36,24 @@ public enum SMFMetaMessage {
     /// A program name.
     case programName(SMFText)
 
+    /// A reserved text event (type 0x0A).
+    case reservedTextA(SMFText)
+
+    /// A reserved text event (type 0x0B).
+    case reservedTextB(SMFText)
+
+    /// A reserved text event (type 0x0C).
+    case reservedTextC(SMFText)
+
+    /// A reserved text event (type 0x0D).
+    case reservedTextD(SMFText)
+
+    /// A reserved text event (type 0x0E).
+    case reservedTextE(SMFText)
+
+    /// A reserved text event (type 0x0F).
+    case reservedTextF(SMFText)
+
     /// A sequence number.
     case sequenceNumber(SMFData2Value)
 
@@ -56,6 +74,9 @@ public enum SMFMetaMessage {
 
     /// A time signature.
     case timeSignature(SMFTimeSignature)
+
+    /// An unrecognized meta-event, preserving its type byte and raw data bytes.
+    case unknown(UInt8, [UInt8])
 }
 
 // MARK: -
@@ -84,7 +105,7 @@ extension SMFMetaMessage {
 
             self = .sequenceNumber(seqNum)
 
-        case 0x01...0x09:
+        case 0x01...0x0f:
             guard let message = Self._makeTextMessage(typeByte,
                                                       dataBytes)
             else { return nil }
@@ -151,6 +172,12 @@ extension SMFMetaMessage {
              let .lyric(text),
              let .marker(text),
              let .programName(text),
+             let .reservedTextA(text),
+             let .reservedTextB(text),
+             let .reservedTextC(text),
+             let .reservedTextD(text),
+             let .reservedTextE(text),
+             let .reservedTextF(text),
              let .sequenceTrackName(text),
              let .text(text):
             text.bytesValue
@@ -181,6 +208,9 @@ extension SMFMetaMessage {
 
         case let .timeSignature(timeSig):
             timeSig.bytesValue
+
+        case let .unknown(_, rawBytes):
+            rawBytes
         }
     }
 
@@ -226,6 +256,24 @@ extension SMFMetaMessage {
         case .programName:
             0x08
 
+        case .reservedTextA:
+            0x0a
+
+        case .reservedTextB:
+            0x0b
+
+        case .reservedTextC:
+            0x0c
+
+        case .reservedTextD:
+            0x0d
+
+        case .reservedTextE:
+            0x0e
+
+        case .reservedTextF:
+            0x0f
+
         case .sequenceNumber:
             0x00
 
@@ -246,6 +294,9 @@ extension SMFMetaMessage {
 
         case .timeSignature:
             0x58
+
+        case let .unknown(typeByteValue, _):
+            typeByteValue
         }
     }
 
@@ -283,6 +334,24 @@ extension SMFMetaMessage {
 
         case 0x09:
             return .deviceName(text)
+
+        case 0x0a:
+            return .reservedTextA(text)
+
+        case 0x0b:
+            return .reservedTextB(text)
+
+        case 0x0c:
+            return .reservedTextC(text)
+
+        case 0x0d:
+            return .reservedTextD(text)
+
+        case 0x0e:
+            return .reservedTextE(text)
+
+        case 0x0f:
+            return .reservedTextF(text)
 
         default:
             return nil

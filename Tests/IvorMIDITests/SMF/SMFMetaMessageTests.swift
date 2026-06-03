@@ -15,6 +15,13 @@ extension SMFMetaMessageTests {
     }
 
     @Test
+    func dataBytes_unknown() {
+        let msg = SMFMetaMessage.unknown(0x42, [0x01, 0x02])
+
+        #expect(msg.dataBytes == [0x01, 0x02])
+    }
+
+    @Test
     func init_copyright() {
         let msg = SMFMetaMessage(statusByte: 0xff,
                                  typeByte: 0x02,
@@ -187,6 +194,90 @@ extension SMFMetaMessageTests {
     }
 
     @Test
+    func init_reservedTextA() {
+        let msg = SMFMetaMessage(statusByte: 0xff,
+                                 typeByte: 0x0a,
+                                 dataBytes: Array("A".utf8))
+
+        #expect(msg != nil)
+
+        if case .reservedTextA = msg {
+        } else {
+            Issue.record("Expected reservedTextA")
+        }
+    }
+
+    @Test
+    func init_reservedTextB() {
+        let msg = SMFMetaMessage(statusByte: 0xff,
+                                 typeByte: 0x0b,
+                                 dataBytes: Array("B".utf8))
+
+        #expect(msg != nil)
+
+        if case .reservedTextB = msg {
+        } else {
+            Issue.record("Expected reservedTextB")
+        }
+    }
+
+    @Test
+    func init_reservedTextC() {
+        let msg = SMFMetaMessage(statusByte: 0xff,
+                                 typeByte: 0x0c,
+                                 dataBytes: Array("C".utf8))
+
+        #expect(msg != nil)
+
+        if case .reservedTextC = msg {
+        } else {
+            Issue.record("Expected reservedTextC")
+        }
+    }
+
+    @Test
+    func init_reservedTextD() {
+        let msg = SMFMetaMessage(statusByte: 0xff,
+                                 typeByte: 0x0d,
+                                 dataBytes: Array("D".utf8))
+
+        #expect(msg != nil)
+
+        if case .reservedTextD = msg {
+        } else {
+            Issue.record("Expected reservedTextD")
+        }
+    }
+
+    @Test
+    func init_reservedTextE() {
+        let msg = SMFMetaMessage(statusByte: 0xff,
+                                 typeByte: 0x0e,
+                                 dataBytes: Array("E".utf8))
+
+        #expect(msg != nil)
+
+        if case .reservedTextE = msg {
+        } else {
+            Issue.record("Expected reservedTextE")
+        }
+    }
+
+    @Test
+    func init_reservedTextF() {
+        let msg = SMFMetaMessage(statusByte: 0xff,
+                                 typeByte: 0x0f,
+                                 dataBytes: Array("F".utf8))
+
+        #expect(msg != nil)
+
+        if case .reservedTextF = msg {
+        } else {
+            Issue.record("Expected reservedTextF")
+        }
+    }
+
+    @Test
     func init_sequenceNumber() {
         let msg = SMFMetaMessage(statusByte: 0xff,
                                  typeByte: 0x00,
@@ -314,5 +405,22 @@ extension SMFMetaMessageTests {
                                   dataBytes: Array("hi".utf8))
 
         #expect(text?.typeByte == 0x01)
+    }
+
+    @Test
+    func typeByte_reservedText() {
+        let bytes = Array("x".utf8)
+
+        #expect(SMFMetaMessage(statusByte: 0xff, typeByte: 0x0a, dataBytes: bytes)?.typeByte == 0x0a)
+        #expect(SMFMetaMessage(statusByte: 0xff, typeByte: 0x0b, dataBytes: bytes)?.typeByte == 0x0b)
+        #expect(SMFMetaMessage(statusByte: 0xff, typeByte: 0x0c, dataBytes: bytes)?.typeByte == 0x0c)
+        #expect(SMFMetaMessage(statusByte: 0xff, typeByte: 0x0d, dataBytes: bytes)?.typeByte == 0x0d)
+        #expect(SMFMetaMessage(statusByte: 0xff, typeByte: 0x0e, dataBytes: bytes)?.typeByte == 0x0e)
+        #expect(SMFMetaMessage(statusByte: 0xff, typeByte: 0x0f, dataBytes: bytes)?.typeByte == 0x0f)
+    }
+
+    @Test
+    func typeByte_unknown() {
+        #expect(SMFMetaMessage.unknown(0x42, []).typeByte == 0x42)
     }
 }

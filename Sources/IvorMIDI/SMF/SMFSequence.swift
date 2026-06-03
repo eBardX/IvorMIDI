@@ -13,14 +13,14 @@ public struct SMFSequence {
     /// - Parameter division:   The time division.
     /// - Parameter tracks:     The tracks in the sequence. Format 0 requires
     ///                         exactly one track; formats 1 and 2 require
-    ///                         between 1 and 32767 tracks (inclusive).
+    ///                         between 1 and 65,535 tracks (inclusive).
     ///
     /// - Precondition: The number of tracks must be compatible with `format`.
     public init(format: SMFFormat,
                 division: SMFDivision,
                 tracks: [SMFTrack]) {
         precondition((format == .format0 && tracks.count == 1)
-                     || (format != .format0 && (1...0x7fff).contains(tracks.count)),
+                     || (format != .format0 && (1...0xffff).contains(tracks.count)),
                      "Track count \(tracks.count) is incompatible with SMF format \(format)")
 
         self.division = division

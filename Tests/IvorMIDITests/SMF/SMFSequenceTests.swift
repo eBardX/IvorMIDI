@@ -41,4 +41,16 @@ extension SMFSequenceTests {
         #expect(sequence.format == .format1)
         #expect(sequence.tracks.count == 2)
     }
+
+    @Test
+    func init_format1_highTrackCount() {
+        let track = SMFTrack(events: [])
+        let tracks = Array(repeating: track, count: 0x8000)
+        let tickRate = SMFTickRate(uintValue: 480)!                     // swiftlint:disable:this force_unwrapping
+        let sequence = SMFSequence(format: .format1,
+                                   division: .metrical(tickRate),
+                                   tracks: tracks)
+
+        #expect(sequence.tracks.count == 0x8000)
+    }
 }
