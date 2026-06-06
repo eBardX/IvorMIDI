@@ -11,6 +11,37 @@ struct SMFFormatterTests {
 
 extension SMFFormatterTests {
     @Test
+    func format_eventAfterEndOfTrack_throws() {
+        let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
+        let noteOn = MIDIChannelMessage(statusByte: 0x90,
+                                        dataBytes: [0x3c, 0x64])!   // swiftlint:disable:this force_unwrapping
+        let track = SMFTrack(events: [.meta(t0, .endOfTrack),
+                                      .midi(t0, noteOn)])
+        let tickRate = SMFTickRate(uintValue: 96)!                  // swiftlint:disable:this force_unwrapping
+        let sequence = SMFSequence(format: .format0,
+                                   division: .metrical(tickRate),
+                                   tracks: [track])
+
+        #expect(throws: (any Error).self) {
+            try SMFFormatter().format(sequence)
+        }
+    }
+
+    @Test
+    func format_existingEndOfTrack_notDuplicated() throws {
+        let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
+        let track = SMFTrack(events: [.meta(t0, .endOfTrack)])
+        let tickRate = SMFTickRate(uintValue: 96)!                  // swiftlint:disable:this force_unwrapping
+        let sequence = SMFSequence(format: .format0,
+                                   division: .metrical(tickRate),
+                                   tracks: [track])
+        let data = try SMFFormatter().format(sequence)
+        let reparsed = try SMFParser().parse(data)
+
+        #expect(reparsed.tracks[0].events.filter { $0.isEndOfTrack }.count == 1)
+    }
+
+    @Test
     func format_format0() throws {
         let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
         let tempo = SMFTempo(uintValue: 500_000)!                   // swiftlint:disable:this force_unwrapping
@@ -89,6 +120,22 @@ extension SMFFormatterTests {
 
         #expect(data[10] == 0x80)
         #expect(data[11] == 0x00)
+    }
+
+    @Test
+    func format_noEndOfTrack_appendsOne() throws {
+        let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
+        let noteOn = MIDIChannelMessage(statusByte: 0x90,
+                                        dataBytes: [0x3c, 0x64])!   // swiftlint:disable:this force_unwrapping
+        let track = SMFTrack(events: [.midi(t0, noteOn)])
+        let tickRate = SMFTickRate(uintValue: 96)!                  // swiftlint:disable:this force_unwrapping
+        let sequence = SMFSequence(format: .format0,
+                                   division: .metrical(tickRate),
+                                   tracks: [track])
+        let data = try SMFFormatter().format(sequence)
+        let reparsed = try SMFParser().parse(data)
+
+        #expect(reparsed.tracks[0].events.last?.isEndOfTrack == true)
     }
 
     @Test

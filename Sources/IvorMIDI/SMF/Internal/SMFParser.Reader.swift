@@ -10,23 +10,28 @@ extension SMFParser {
 
         // MARK: Internal Initializers
 
-        internal init(data: Data) {
+        internal init(data: Data,
+                      strictness: Strictness) {
             self.chunkBytesLeft = 0
             self.chunkMode = false
             self.currentIndex = 0
             self.currentTime = 0
             self.data = data
+            self.diagnostics = []
             self.runningStatus = 0
+            self.strictness = strictness
         }
 
         // MARK: Private Instance Properties
 
         private let data: Data
+        private let strictness: Strictness
 
         private var chunkBytesLeft: UInt
         private var chunkMode: Bool
         private var currentIndex: Int
         private var currentTime: UInt
+        private var diagnostics: [SMFDiagnostic]
         private var runningStatus: UInt8
     }
 }
@@ -37,12 +42,12 @@ extension SMFParser.Reader {
 
     // MARK: Internal Instance Methods
 
-    internal mutating func readSequence() throws -> SMFSequence {
+    internal mutating func readSequence() throws -> (SMFSequence, [SMFDiagnostic]) {
         guard let chunkType = try _readChunk(),
               chunkType == .header
         else { throw SMFParseError.missingHeaderChunk }
 
-        let (format, trackCount, division) = try _readHeader()
+        let (format, ntrks, division) = try _readHeader()
 
         var tracks: [SMFTrack] = []
 
@@ -52,7 +57,7 @@ extension SMFParser.Reader {
                 throw SMFParseError.tooManyHeaderChunks
 
             case .track:
-                try tracks.append(_readTrack())
+                try tracks.append(_readTrack(index: tracks.count))
 
             default:
                 break   // ignore unknown chunks
@@ -61,17 +66,45 @@ extension SMFParser.Reader {
             try _skipExtraChunkData()
         }
 
-        if tracks.count < trackCount {
-            throw SMFParseError.notEnoughTrackChunks
+        guard !tracks.isEmpty
+        else { throw SMFParseError.invalidTrackCount(0, format) }
+
+        var effectiveFormat = format
+
+        switch strictness {
+        case .lenient:
+            let actual = UInt(tracks.count)
+
+            if actual != ntrks {
+                diagnostics.append(.trackCountMismatch(declared: ntrks,
+                                                       actual: actual))
+            }
+
+            if format == .format0,
+               tracks.count > 1 {
+                effectiveFormat = .format1
+
+                diagnostics.append(.trackFormatCoerced(from: format,
+                                                       to: .format1))
+            }
+
+        case .strict:
+            if tracks.count < ntrks {
+                throw SMFParseError.notEnoughTrackChunks
+            }
+
+            if tracks.count > ntrks {
+                throw SMFParseError.tooManyTrackChunks
+            }
         }
 
-        if tracks.count > trackCount {
-            throw SMFParseError.tooManyTrackChunks
-        }
+        guard (effectiveFormat == .format0 && tracks.count == 1)
+              || (effectiveFormat != .format0 && (1...0xffff).contains(tracks.count))
+        else { throw SMFParseError.invalidTrackCount(UInt(tracks.count), effectiveFormat) }
 
-        return SMFSequence(format: format,
-                           division: division,
-                           tracks: tracks)
+        return (SMFSequence(format: effectiveFormat,
+                            division: division,
+                            tracks: tracks), diagnostics)
     }
 
     // MARK: Private Instance Methods
@@ -113,6 +146,17 @@ extension SMFParser.Reader {
         let chunkType = try _readChunkType()
 
         chunkBytesLeft = try _readChunkLength()
+
+        if strictness == .lenient {
+            let available = UInt(data.count - currentIndex)
+
+            if chunkBytesLeft > available {
+                diagnostics.append(.chunkLengthClamped(declared: chunkBytesLeft,
+                                                       available: available))
+
+                chunkBytesLeft = available
+            }
+        }
 
         currentTime = 0
         runningStatus = 0
@@ -247,7 +291,15 @@ extension SMFParser.Reader {
     }
 
     private mutating func _readStatusByte() throws -> (UInt8, [UInt8]) {
-        let tmpByte = try _readByte()
+        var tmpByte = try _readByte()
+
+        if strictness == .lenient {
+            while tmpByte.isSystemRealTimeByte {
+                diagnostics.append(.strayRealTimeByteSkipped)
+
+                tmpByte = try _readByte()
+            }
+        }
 
         if tmpByte.isMIDIStatusByte {
             return (tmpByte, [])
@@ -274,13 +326,33 @@ extension SMFParser.Reader {
         return .sysEx(eventTime, message)
     }
 
-    private mutating func _readTrack() throws -> SMFTrack {
+    private mutating func _readTrack(index trackIndex: Int) throws -> SMFTrack {
         chunkMode = true
 
         var events: [SMFEvent] = []
+        var foundEOT = false
 
         while chunkBytesLeft > 0 {
-            try events.append(_readEvent())
+            do {
+                let event = try _readEvent()
+
+                events.append(event)
+
+                if event.isEndOfTrack {
+                    foundEOT = true
+                    break
+                }
+            } catch SMFParseError.dataExhaustedPrematurely where strictness == .lenient {
+                currentIndex = data.count
+                chunkBytesLeft = 0
+                break
+            }
+        }
+
+        try _skipExtraChunkData()
+
+        if !foundEOT, strictness == .lenient {
+            diagnostics.append(.missingEndOfTrack(trackIndex: trackIndex))
         }
 
         guard !events.isEmpty
@@ -295,9 +367,11 @@ extension SMFParser.Reader {
 
         let trackCount = UInt(byte0Value) << 8 | UInt(byte1Value)
 
-        guard (format == .format0 && trackCount == 1)
-                || (format != .format0 && (1...0xffff).contains(trackCount))
-        else { throw SMFParseError.invalidTrackCount(trackCount, format) }
+        if strictness == .strict {
+            guard (format == .format0 && trackCount == 1)
+                  || (format != .format0 && (1...0xffff).contains(trackCount))
+            else { throw SMFParseError.invalidTrackCount(trackCount, format) }
+        }
 
         return trackCount
     }
@@ -322,10 +396,17 @@ extension SMFParser.Reader {
         guard chunkBytesLeft > 0
         else { return }
 
-        guard currentIndex + Int(chunkBytesLeft) <= data.count
-        else { throw SMFParseError.dataExhaustedPrematurely }
+        let available = data.count - currentIndex
 
-        currentIndex += Int(chunkBytesLeft)
+        if Int(chunkBytesLeft) > available {
+            if strictness == .strict {
+                throw SMFParseError.dataExhaustedPrematurely
+            }
+
+            currentIndex = data.count
+        } else {
+            currentIndex += Int(chunkBytesLeft)
+        }
 
         chunkBytesLeft = 0
     }

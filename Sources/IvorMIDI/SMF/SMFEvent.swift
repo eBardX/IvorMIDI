@@ -29,6 +29,16 @@ extension SMFEvent {
             eventTime
         }
     }
+
+    // MARK: Internal Instance Properties
+
+    internal var isEndOfTrack: Bool {
+        if case .meta(_, .endOfTrack) = self {
+            true
+        } else {
+            false
+        }
+    }
 }
 
 // MARK: - Sendable

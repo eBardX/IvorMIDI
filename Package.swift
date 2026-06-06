@@ -25,5 +25,6 @@ let package = Package(name: "IvorMIDI",
                                         swiftSettings: swiftSettings),
                                 .testTarget(name: "IvorMIDITests",
                                             dependencies: [.target(name: "IvorMIDI")],
+                                            resources: [.process("Fixtures")],
                                             swiftSettings: swiftSettings)],
                       swiftLanguageModes: [.v6])

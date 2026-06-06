@@ -21,4 +21,10 @@ extension UInt8 {
     public var isSysExEventStatusByte: Bool {
         [0xf0, 0xf7].contains(self)
     }
+
+    /// A Boolean value indicating whether this byte is a system real-time
+    /// status byte (0xf8–0xfe).
+    internal var isSystemRealTimeByte: Bool {
+        (0xf8...0xfe).contains(self)
+    }
 }

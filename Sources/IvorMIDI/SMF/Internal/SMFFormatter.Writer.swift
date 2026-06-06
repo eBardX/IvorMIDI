@@ -190,7 +190,21 @@ extension SMFFormatter.Writer {
         currentTime = 0
         runningStatus = 0
 
-        try track.events.forEach { try _writeEvent($0) }
+        let events: [SMFEvent]
+
+        if let eotIndex = track.events.firstIndex(where: { $0.isEndOfTrack }) {
+            if eotIndex < track.events.count - 1 {
+                throw SMFFormatError.badEvent(track.events[eotIndex + 1])
+            }
+
+            events = track.events
+        } else {
+            let eotTime = track.events.last?.eventTime ?? .zero
+
+            events = track.events + [.meta(eotTime, .endOfTrack)]
+        }
+
+        try events.forEach { try _writeEvent($0) }
 
         try _writeChunk(.track)
     }
