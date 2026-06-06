@@ -21,6 +21,16 @@ public struct SMFTrack {
     public let events: [SMFEvent]
 }
 
+// MARK: - Equatable
+
+extension SMFTrack: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFTrack: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFTrack: Sendable {

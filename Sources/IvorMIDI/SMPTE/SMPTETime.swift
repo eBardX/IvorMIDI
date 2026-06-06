@@ -141,6 +141,16 @@ extension SMPTETime: BytesValueConvertible {
     }
 }
 
+// MARK: - Equatable
+
+extension SMPTETime: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMPTETime: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMPTETime: Sendable {

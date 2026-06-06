@@ -306,6 +306,16 @@ extension SMFKeySignature: BytesValueConvertible {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFKeySignature: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFKeySignature: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFKeySignature: Sendable {

@@ -22,6 +22,11 @@ extension SMFValidationIssue {
 extension SMFValidationIssue.Severity: Equatable {
 }
 
+// MARK: - Hashable
+
+extension SMFValidationIssue.Severity: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFValidationIssue.Severity: Sendable {

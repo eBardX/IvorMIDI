@@ -269,6 +269,16 @@ extension MIDISystemMessage {
     }
 }
 
+// MARK: - Equatable
+
+extension MIDISystemMessage: Equatable {
+}
+
+// MARK: - Hashable
+
+extension MIDISystemMessage: Hashable {
+}
+
 // MARK: - Sendable
 
 extension MIDISystemMessage: Sendable {

@@ -61,6 +61,16 @@ extension SMFSysExMessage {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFSysExMessage: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFSysExMessage: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFSysExMessage: Sendable {

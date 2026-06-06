@@ -359,6 +359,16 @@ extension SMFMetaMessage {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFMetaMessage: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFMetaMessage: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFMetaMessage: Sendable {

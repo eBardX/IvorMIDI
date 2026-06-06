@@ -54,6 +54,16 @@ extension SMFDivision: BytesValueConvertible {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFDivision: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFDivision: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFDivision: Sendable {

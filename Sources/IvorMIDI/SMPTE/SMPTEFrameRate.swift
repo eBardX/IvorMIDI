@@ -38,6 +38,16 @@ extension SMPTEFrameRate {
     }
 }
 
+// MARK: - Equatable
+
+extension SMPTEFrameRate: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMPTEFrameRate: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMPTEFrameRate: Sendable {

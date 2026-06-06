@@ -88,6 +88,16 @@ extension SMFTimeSignature: BytesValueConvertible {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFTimeSignature: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFTimeSignature: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFTimeSignature: Sendable {

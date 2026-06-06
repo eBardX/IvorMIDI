@@ -41,6 +41,16 @@ extension SMFEvent {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFEvent: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFEvent: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFEvent: Sendable {

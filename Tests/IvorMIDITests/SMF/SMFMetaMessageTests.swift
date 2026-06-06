@@ -22,6 +22,33 @@ extension SMFMetaMessageTests {
     }
 
     @Test
+    func equality_endOfTrack() {
+        #expect(SMFMetaMessage.endOfTrack == .endOfTrack)
+    }
+
+    @Test
+    func equality_unknown() {
+        #expect(SMFMetaMessage.unknown(0x42, [0x01, 0x02]) == .unknown(0x42, [0x01, 0x02]))
+    }
+
+    @Test
+    func inequality_differentCases() {
+        let tempo = SMFTempo(uintValue: 500_000)!                   // swiftlint:disable:this force_unwrapping
+
+        #expect(SMFMetaMessage.endOfTrack != .tempo(tempo))
+    }
+
+    @Test
+    func inequality_differentData() {
+        #expect(SMFMetaMessage.unknown(0x42, [0x01]) != .unknown(0x42, [0x02]))
+    }
+
+    @Test
+    func inequality_differentType() {
+        #expect(SMFMetaMessage.unknown(0x42, []) != .unknown(0x43, []))
+    }
+
+    @Test
     func init_copyright() {
         let msg = SMFMetaMessage(statusByte: 0xff,
                                  typeByte: 0x02,

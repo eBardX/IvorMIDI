@@ -249,6 +249,16 @@ extension MIDIChannelMessage {
     }
 }
 
+// MARK: - Equatable
+
+extension MIDIChannelMessage: Equatable {
+}
+
+// MARK: - Hashable
+
+extension MIDIChannelMessage: Hashable {
+}
+
 // MARK: - Sendable
 
 extension MIDIChannelMessage: Sendable {

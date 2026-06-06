@@ -79,6 +79,14 @@ extension MIDIChannelMessageTests {
     }
 
     @Test
+    func equality() {
+        let msg1 = MIDIChannelMessage(statusByte: 0x90, dataBytes: [0x3c, 0x64])!  // swiftlint:disable:this force_unwrapping
+        let msg2 = MIDIChannelMessage(statusByte: 0x90, dataBytes: [0x3c, 0x64])!  // swiftlint:disable:this force_unwrapping
+
+        #expect(msg1 == msg2)
+    }
+
+    @Test
     func expectedDataByteCount() {
         #expect(MIDIChannelMessage.expectedDataByteCount(for: 0x80) == 2)
         #expect(MIDIChannelMessage.expectedDataByteCount(for: 0x90) == 2)
@@ -89,6 +97,22 @@ extension MIDIChannelMessageTests {
         #expect(MIDIChannelMessage.expectedDataByteCount(for: 0xe0) == 2)
         #expect(MIDIChannelMessage.expectedDataByteCount(for: 0xf0) == nil)
         #expect(MIDIChannelMessage.expectedDataByteCount(for: 0x70) == nil)
+    }
+
+    @Test
+    func inequality_differentMessageType() {
+        let noteOn  = MIDIChannelMessage(statusByte: 0x90, dataBytes: [0x3c, 0x64])!   // swiftlint:disable:this force_unwrapping
+        let noteOff = MIDIChannelMessage(statusByte: 0x80, dataBytes: [0x3c, 0x40])!   // swiftlint:disable:this force_unwrapping
+
+        #expect(noteOn != noteOff)
+    }
+
+    @Test
+    func inequality_differentNote() {
+        let msg1 = MIDIChannelMessage(statusByte: 0x90, dataBytes: [0x3c, 0x64])!  // swiftlint:disable:this force_unwrapping
+        let msg2 = MIDIChannelMessage(statusByte: 0x90, dataBytes: [0x3d, 0x64])!  // swiftlint:disable:this force_unwrapping
+
+        #expect(msg1 != msg2)
     }
 
     @Test

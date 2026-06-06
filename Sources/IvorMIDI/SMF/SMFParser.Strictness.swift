@@ -21,6 +21,11 @@ extension SMFParser {
 extension SMFParser.Strictness: Equatable {
 }
 
+// MARK: - Hashable
+
+extension SMFParser.Strictness: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFParser.Strictness: Sendable {

@@ -11,6 +11,54 @@ struct SMFSequenceTests {
 
 extension SMFSequenceTests {
     @Test
+    func equality() {
+        let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
+        let tickRate = SMFTickRate(uintValue: 480)!                  // swiftlint:disable:this force_unwrapping
+        let track = SMFTrack(events: [.meta(t0, .endOfTrack)])
+        let seq1 = SMFSequence(format: .format0,
+                               division: .metrical(tickRate),
+                               tracks: [track])
+        let seq2 = SMFSequence(format: .format0,
+                               division: .metrical(tickRate),
+                               tracks: [track])
+
+        #expect(seq1 == seq2)
+    }
+
+    @Test
+    func inequality_differentDivision() {
+        let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
+        let track = SMFTrack(events: [.meta(t0, .endOfTrack)])
+        let tickRate96 = SMFTickRate(uintValue: 96)!                // swiftlint:disable:this force_unwrapping
+        let tickRate480 = SMFTickRate(uintValue: 480)!              // swiftlint:disable:this force_unwrapping
+        let seq1 = SMFSequence(format: .format0,
+                               division: .metrical(tickRate96),
+                               tracks: [track])
+        let seq2 = SMFSequence(format: .format0,
+                               division: .metrical(tickRate480),
+                               tracks: [track])
+
+        #expect(seq1 != seq2)
+    }
+
+    @Test
+    func inequality_differentTrackContents() {
+        let t0 = SMFEventTime(uintValue: 0)!                        // swiftlint:disable:this force_unwrapping
+        let t1 = SMFEventTime(uintValue: 96)!                       // swiftlint:disable:this force_unwrapping
+        let tickRate = SMFTickRate(uintValue: 96)!                  // swiftlint:disable:this force_unwrapping
+        let track1 = SMFTrack(events: [.meta(t0, .endOfTrack)])
+        let track2 = SMFTrack(events: [.meta(t1, .endOfTrack)])
+        let seq1 = SMFSequence(format: .format0,
+                               division: .metrical(tickRate),
+                               tracks: [track1])
+        let seq2 = SMFSequence(format: .format0,
+                               division: .metrical(tickRate),
+                               tracks: [track2])
+
+        #expect(seq1 != seq2)
+    }
+
+    @Test
     func init_format0() {
         let eventTime = SMFEventTime(uintValue: 0)!                     // swiftlint:disable:this force_unwrapping
         let track = SMFTrack(events: [.meta(eventTime, .endOfTrack)])

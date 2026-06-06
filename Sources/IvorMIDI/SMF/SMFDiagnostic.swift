@@ -55,6 +55,11 @@ extension SMFDiagnostic {
 extension SMFDiagnostic: Equatable {
 }
 
+// MARK: - Hashable
+
+extension SMFDiagnostic: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFDiagnostic: Sendable {

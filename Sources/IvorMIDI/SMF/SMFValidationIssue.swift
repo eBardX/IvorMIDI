@@ -81,6 +81,11 @@ extension SMFValidationIssue {
 extension SMFValidationIssue: Equatable {
 }
 
+// MARK: - Hashable
+
+extension SMFValidationIssue: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFValidationIssue: Sendable {

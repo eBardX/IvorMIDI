@@ -94,6 +94,16 @@ extension SMFSequence {
     }
 }
 
+// MARK: - Equatable
+
+extension SMFSequence: Equatable {
+}
+
+// MARK: - Hashable
+
+extension SMFSequence: Hashable {
+}
+
 // MARK: - Sendable
 
 extension SMFSequence: Sendable {
