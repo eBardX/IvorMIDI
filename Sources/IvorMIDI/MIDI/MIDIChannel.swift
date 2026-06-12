@@ -67,8 +67,3 @@ extension MIDIChannel: BytesValueConvertible {
         return [byte0Value]
     }
 }
-
-// MARK: - Sendable
-
-extension MIDIChannel: Sendable {
-}

@@ -69,8 +69,3 @@ extension SMFTempo: BytesValueConvertible {
         return [byte0Value, byte1Value, byte2Value]
     }
 }
-
-// MARK: - Sendable
-
-extension SMFTempo: Sendable {
-}

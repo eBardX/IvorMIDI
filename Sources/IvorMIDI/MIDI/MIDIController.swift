@@ -286,8 +286,3 @@ extension MIDIController: BytesValueConvertible {
         return [byte0Value]
     }
 }
-
-// MARK: - Sendable
-
-extension MIDIController: Sendable {
-}

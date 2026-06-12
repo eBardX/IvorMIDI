@@ -59,8 +59,3 @@ extension SMFText: BytesValueConvertible {
         return bytes
     }
 }
-
-// MARK: - Sendable
-
-extension SMFText: Sendable {
-}

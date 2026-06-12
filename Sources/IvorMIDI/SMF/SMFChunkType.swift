@@ -45,8 +45,3 @@ public struct SMFChunkType: StringRepresentable {
     /// The chunk type identifier string.
     public let stringValue: String
 }
-
-// MARK: - Sendable
-
-extension SMFChunkType: Sendable {
-}

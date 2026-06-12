@@ -71,8 +71,3 @@ extension MIDIPitchBend: BytesValueConvertible {
         return [byte0Value, byte1Value]
     }
 }
-
-// MARK: - Sendable
-
-extension MIDIPitchBend: Sendable {
-}
