@@ -4,110 +4,77 @@
     @PageColor(blue)
 }
 
-A Standard MIDI Files parser and formatter.
+A Standard MIDI Files parser, formatter, and validator.
 
 ## Overview
 
-IvorMIDI parses and formats [Standard MIDI Files](https://midi.org/standard-midi-files)
-(SMF, RP-001). It handles all three SMF formats, all standard meta-event types, MIDI channel
-messages, system-exclusive events, SMPTE time division, and the extended meta-event types
-defined in RP-001 Appendix C (device name, program name, MIDI port, reserved text events
-0x0A–0x0F).
+The IvorMIDI framework provides a [Standard MIDI Files]() parser, formatter, and
+validator written in Swift. It targets [RP-001 Standard MIDI Files
+1.0](https://midi.org/standard-midi-files-specification), as extended by [RP-017
+SMF Lyric Meta Event
+Definition](https://midi.org/smf-lyric-meta-event-definition), [RP-019 SMF
+Device Name and Program Name Meta
+Events](https://midi.org/smf-device-name-and-program-name-meta-events), and
+[RP-026 SMF Language and Display
+Extensions](https://midi.org/smf-language-and-display-extensions), with a
+strict-concurrency-ready, value-type API.
 
-### Parsing
+### The pipeline
 
-``SMFParser`` decodes raw binary data into an ``SMFSequence``. By default it enforces strict
-conformance to RP-001; any deviation causes a ``SMFParseError``. Pass
-``SMFParser/Strictness/lenient`` to recover from common real-world issues instead — the parser
-collects ``SMFDiagnostic`` values describing each deviation it repaired:
+Everything flows through a small, explicit pipeline of four value types, each a
+`Sendable` value type with a no-argument initializer:
+
+ Stage     | Type               | Input → Output
+:-----     |:----               |:--------------
+ Parse     | ``SMFParser``      | `Data` → ``SMFSequence``
+ Normalize | ``SMFNormalizer``  | ``SMFSequence`` → ``SMFSequence`` (canonical)
+ Validate  | ``SMFValidator``   | ``SMFSequence`` → validated ``SMFSequence``
+ Format    | ``SMFFormatter``   | ``SMFSequence`` → `Data`
+
+An ``SMFSequence`` carries two Boolean state flags that enforce the order of the
+pipeline: a sequence must be normalized before it can be validated, and
+validated before it can be formatted. Both normalization and validation are
+idempotent, so it is always safe to run the full pipeline:
 
 ```swift
-// Strict (default) — throws on any spec deviation
-let sequence = try SMFParser().parse(data)
+import Foundation
+import IvorMIDI
 
-// Lenient — recovers from common issues and reports what was repaired
-let (sequence, diagnostics) = try SMFParser(strictness: .lenient)
-                                            .parseWithDiagnostics(data)
-for diagnostic in diagnostics {
-    print(diagnostic.message)
+let data = try Data(contentsOf: url)
+
+let (parsed, diagnostics) = try SMFParser().parse(data)
+let (normalized, changes) = SMFNormalizer().normalize(parsed)
+let (validated, issues)   = try SMFValidator().validate(normalized)
+
+guard issues.isEmpty else {
+    issues.forEach { print($0.message) }
+    return
 }
+
+let output = try SMFFormatter().format(validated)  // back to SMF
 ```
 
-Lenient mode handles: truncated chunk lengths, missing End-of-Track events, stray
-system-real-time bytes (0xF8–0xFE) embedded in the event stream, track-count mismatches
-between the header and the actual MTrk chunks, and format-0 files that incorrectly contain
-more than one track (coerced to format 1).
-
-### Formatting
-
-``SMFFormatter`` encodes an ``SMFSequence`` to binary data. It automatically appends an
-End-of-Track meta-event to any track that lacks one, and throws ``SMFFormatError`` if a track
-contains events after its End-of-Track marker:
-
-```swift
-let data = try SMFFormatter().format(sequence)
-```
-
-### Validation
-
-``SMFSequence/validate()`` checks a sequence for spec violations without throwing, returning an
-array of ``SMFValidationIssue`` values. Each issue has a ``SMFValidationIssue/severity``
-(``SMFValidationIssue/Severity/error`` or ``SMFValidationIssue/Severity/warning``) and a
-human-readable ``SMFValidationIssue/message``. An empty array means the sequence is fully
-conformant:
-
-```swift
-let issues = sequence.validate()
-if issues.isEmpty {
-    print("Sequence is fully conformant")
-} else {
-    for issue in issues {
-        print("[\(issue.severity)] \(issue.message)")
-    }
-}
-```
-
-Error-severity issues (missing or misplaced End-of-Track) will cause ``SMFFormatter`` to throw.
-Warning-severity issues (tempo/time-signature in the wrong track, sequence number not at time
-zero) may cause interoperability problems with some players.
-
-### Scope and non-goals
-
-IvorMIDI covers the RP-001 SMF specification as described above. The following are
-**deliberately out of scope**:
-
-- **RMID (`.rmi`) files** — the RIFF wrapper around an SMF payload is not supported.
-- **Tempo-map to wall-clock conversion** — IvorMIDI works in ticks; converting to seconds
-  requires integrating the tempo track, which is application-domain logic.
-- **MIDI 2.0 / UMP** — IvorMIDI targets MIDI 1.0 SMF only.
-- **Real-time MIDI I/O** — IvorMIDI is a file-format library; it does not transmit or receive
-  live MIDI data.
+See <doc:UsingIvorMIDI> for a full guide to each stage, the models, and error
+handling.
 
 ## Topics
 
 ### Guides
 
-- <doc:ReadingMessyFiles>
+- <doc:UsingIvorMIDI>
 
-### Parsing
+### Processing
 
 - ``SMFParser``
-- ``SMFParser/Strictness``
-- ``SMFDiagnostic``
-- ``SMFParseError``
-
-### Formatting
-
+- ``SMFNormalizer``
+- ``SMFValidator``
 - ``SMFFormatter``
-- ``SMFFormatError``
 
 ### Sequence model
 
 - ``SMFSequence``
 - ``SMFTrack``
 - ``SMFEvent``
-- ``SMFValidationIssue``
-- ``SMFValidationIssue/Severity``
 
 ### Event content
 
@@ -141,7 +108,3 @@ IvorMIDI covers the RP-001 SMF specification as described above. The following a
 - ``MIDIData1Value``
 - ``MIDIData2Value``
 - ``MIDIPitchBend``
-
-### Protocols
-
-- ``BytesValueConvertible``

@@ -1,50 +1,123 @@
 # IvorMIDI
 
-A Standard MIDI Files parser and formatter.
+A Standard MIDI Files parser, normalizer, validator, and formatter.
+
+[![Swift 6.3](https://img.shields.io/badge/Swift-6.3-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20macOS-lightgrey.svg)](https://developer.apple.com)
+[![SwiftPM](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/eBardX/IvorMIDI/blob/main/LICENSE.md)
+
+* [Overview](#overview)
+* [Requirements](#requirements)
+* [Installation](#installation)
+    * [Swift Package Manager](#spm_installation)
+* [Quick Start](#quick_start)
+* [Documentation](#documentation)
+* [Reference Documentation](#reference_documentation)
+* [Credits](#credits)
+* [License](#license)
 
 ## <a name="overview">Overview</a>
 
-The IvorMIDI framework provides a [Standard MIDI
-Files](https://midi.org/standard-midi-files) parser and formatter written in
-Swift.
+The IvorMIDI framework provides a [Standard MIDI Files][smf] parser, formatter,
+and resolver written in Swift. It targets [RP-001 Standard MIDI Files
+1.0][rp001], as extended by [RP-017 SMF Lyric Meta Event Definition][rp017],
+[RP-019 SMF Device Name and Program Name Meta Events][rp019], and [RP-026 SMF
+Language and Display Extensions][rp026], with a strict-concurrency-ready,
+value-type API.
 
-### Parsing
+Everything flows through a small, explicit pipeline of five value types, each
+with a no-argument initializer:
 
-`SMFParser` decodes raw binary data into an `SMFSequence`. By default it enforces strict
-conformance to RP-001 and throws `SMFParseError` on any deviation. For real-world files that
-bend the spec, pass `.lenient` to recover silently and collect `SMFDiagnostic` values
-describing each repair:
+ Stage     | Type            | Input → Output
+:-----     |:----            |:--------------
+ Parse     | `SMFParser`     | `Data` → `SMFSequence`
+ Normalize | `SMFNormalizer` | `SMFSequence` → `SMFSequence` (canonical)
+ Validate  | `SMFValidator`  | `SMFSequence` → validated `SMFSequence`
+ Format    | `SMFFormatter`  | `SMFSequence` → `Data`
+
+The pipeline is gated by two flags on `SMFSequence`: a sequence must be
+normalized before it can be validated, and validated before it can be formatted
+or resolved. See the [usage guide][guide] for a full walkthrough of the API.
+
+## <a name="requirements">Requirements</a>
+
+* iOS 18.0+ / macOS 15.0+
+* Swift 6.3 toolchain
+* Swift 6 language mode
+
+## <a name="installation">Installation</a>
+
+### <a name="spm_installation">Swift Package Manager</a>
+
+IvorMIDI is distributed exclusively through the [Swift Package Manager][spm].
+
+To add IvorMIDI to a Swift package, add it to the `dependencies` in your
+`Package.swift`:
 
 ```swift
-// Strict (default)
-let sequence = try SMFParser().parse(data)
-
-// Lenient — recovers from common deviations and reports what was repaired
-let (sequence, diagnostics) = try SMFParser(strictness: .lenient)
-                                            .parseWithDiagnostics(data)
+dependencies: [
+    .package(url: "https://github.com/eBardX/IvorMIDI.git",
+             .upToNextMajor(from: "2.0.0"))
+]
 ```
 
-### Formatting
-
-`SMFFormatter` encodes an `SMFSequence` to binary data. It automatically appends a missing
-End-of-Track event to any track that lacks one:
+Then add `IvorMIDI` to the dependencies of any target that uses it:
 
 ```swift
-let data = try SMFFormatter().format(sequence)
+.target(name: "MyTarget",
+        dependencies: [.product(name: "IvorMIDI",
+                                package: "IvorMIDI")])
 ```
 
-### Validation
+To add IvorMIDI to an Xcode project, choose **File ▸ Add Package Dependencies…**
+and enter the repository URL:
 
-`SMFSequence.validate()` checks a sequence for spec violations without throwing, returning
-`[SMFValidationIssue]`. Each issue has a severity (`.error` or `.warning`) and a
-human-readable message:
+```
+https://github.com/eBardX/IvorMIDI.git
+```
+
+IvorMIDI depends on [XestiTools][xestitools]; the Swift Package Manager resolves
+it automatically.
+
+## <a name="quick_start">Quick Start</a>
+
+Take an SMF file from `Data` all the way back to `Data`:
 
 ```swift
-let issues = sequence.validate()
-for issue in issues {
-    print("[\(issue.severity)] \(issue.message)")
-}
+import Foundation
+import IvorMIDI
+
+let data = try Data(contentsOf: url)
+
+// 1. Parse raw bytes into a typed sequence. Always tolerant — recoverable
+//    deviations are reported as diagnostics rather than thrown.
+let (parsed, diagnostics) = try SMFParser().parse(data)
+
+// 2. Normalize to canonical form (a single trailing End-of-Track per track).
+let (normalized, changes) = SMFNormalizer().normalize(parsed)
+
+// 3. Validate against the SMF 1.0 specification (+ extensions).
+let (validated, issues) = try SMFValidator().validate(normalized)
+
+guard issues.isEmpty
+else { issues.forEach { print($0.message) }; return }
+
+// 4. Format back to binary data.
+let output = try SMFFormatter().format(validated)
 ```
+
+Each stage is independent, so you can stop at the AST or round-trip through the
+formatter. For the complete story — the AST models and error handling — see the
+[usage guide][guide].
+
+## <a name="documentation">Documentation</a>
+
+* [Using IvorMIDI][guide] — a guide to using the public API, published as part
+  of the DocC documentation.
+* Every public declaration carries a DocC comment; a few call out the
+  relevant page of the [RP-001 specification][smf] where a clamping or other
+  spec-mandated behavior needs justification.
 
 ## <a name="reference_documentation">Reference Documentation</a>
 
@@ -58,6 +131,14 @@ John Gary Pusey (ebardx@gmail.com)
 
 IvorMIDI is available under [the MIT license][license].
 
-[docc]:     https://www.swift.org/documentation/docc/
-[license]:  https://github.com/eBardX/IvorMIDI/blob/main/LICENSE.md
-[refdoc]:   https://eBardX.github.io/ivor-packages-docs/documentation/ivormidi
+[docc]:         https://www.swift.org/documentation/docc/
+[guide]:        https://eBardX.github.io/ivor-packages-docs/documentation/ivormidi/usingivormidi
+[license]:      https://github.com/eBardX/IvorMIDI/blob/main/LICENSE.md
+[refdoc]:       https://eBardX.github.io/ivor-packages-docs/documentation/ivormidi
+[rp001]:	    https://midi.org/standard-midi-files-specification
+[rp017]:	    https://midi.org/smf-lyric-meta-event-definition
+[rp019]:	    https://midi.org/smf-device-name-and-program-name-meta-events
+[rp026]:	    https://midi.org/smf-language-and-display-extensions
+[smf]:          https://midi.org/standard-midi-files
+[spm]:          https://swift.org/package-manager/
+[xestitools]:   https://github.com/eBardX/XestiTools
