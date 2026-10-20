@@ -26,7 +26,9 @@ real-time messages. Every message and data value can be converted to and from
 its [MIDI 1.0][midi1] wire encoding.
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
-whole control change sequence.
+whole control change sequence. Universal system exclusive messages
+for master volume, master tuning, and scale/octave tuning are built the same
+way.
 
 ## <a name="requirements">Requirements</a>
 
