@@ -86,6 +86,18 @@ extension MIDIData1ValueTests {
     }
 
     @Test
+    func init_clamping() {
+        #expect(MIDIData1Value(clamping: -1).uintValue == 0)
+        #expect(MIDIData1Value(clamping: 0).uintValue == 0)
+        #expect(MIDIData1Value(clamping: 64).uintValue == 64)
+        #expect(MIDIData1Value(clamping: 127).uintValue == 127)
+        #expect(MIDIData1Value(clamping: 128).uintValue == 127)
+        #expect(MIDIData1Value(clamping: Int.min).uintValue == 0)
+        #expect(MIDIData1Value(clamping: UInt.max).uintValue == 127)
+        #expect(MIDIData1Value(clamping: UInt8(200)).uintValue == 127)
+    }
+
+    @Test
     func init_integerLiteral() {
         let value: MIDIData1Value = 60
 

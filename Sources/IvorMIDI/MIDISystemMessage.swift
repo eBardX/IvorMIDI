@@ -78,6 +78,43 @@ public enum MIDISystemMessage {
 
 extension MIDISystemMessage {
 
+    // MARK: Public Type Methods
+
+    /// Returns the number of data bytes that follow the provided status byte
+    /// in a system message.
+    ///
+    /// A system exclusive message has no fixed number of data bytes, so its
+    /// status byte (0xF0) returns `nil`, as do the undefined status bytes
+    /// (0xF4, 0xF5, 0xF9, and 0xFD).
+    ///
+    /// - Parameter statusByte: The status byte.
+    ///
+    /// - Returns:  The expected number of data bytes (0–2), or `nil` if the
+    ///             status byte does not begin a fixed-length system message.
+    public static func expectedDataByteCount(for statusByte: UInt8) -> Int? {
+        switch statusByte {
+        case 0xf1,
+             0xf3:
+            1
+
+        case 0xf2:
+            2
+
+        case 0xf6,
+             0xf7,
+             0xf8,
+             0xfa,
+             0xfb,
+             0xfc,
+             0xfe,
+             0xff:
+            0
+
+        default:
+            nil
+        }
+    }
+
     // MARK: Public Instance Properties
 
     /// The data bytes of this message’s MIDI wire encoding, or `nil` if it
@@ -109,6 +146,8 @@ extension MIDISystemMessage {
     }
 
     /// The status byte of this message’s MIDI wire encoding.
+    ///
+    /// Every system message has a status byte, so this is never `nil`.
     public var statusByte: UInt8? {
         switch self {
         case .activeSensing:
@@ -256,6 +295,39 @@ extension MIDISystemMessage: Equatable {
 // MARK: - Hashable
 
 extension MIDISystemMessage: Hashable {
+}
+
+// MARK: - MIDIBytesConvertible
+
+extension MIDISystemMessage: MIDIBytesConvertible {
+
+    // MARK: Public Initializers
+
+    /// Creates a `MIDISystemMessage` instance from its complete MIDI wire
+    /// encoding, or `nil` if the bytes do not encode a valid system message.
+    ///
+    /// - Parameter bytesValue: The status byte followed by the data bytes.
+    ///                         For a system exclusive message, these end with
+    ///                         the terminating EOX byte (0xF7).
+    public init?(bytesValue: [UInt8]) {
+        guard let statusByte = bytesValue.first
+        else { return nil }
+
+        self.init(statusByte: statusByte,
+                  dataBytes: Array(bytesValue.dropFirst()))
+    }
+
+    // MARK: Public Instance Properties
+
+    /// The complete MIDI wire encoding of this message: the status byte
+    /// followed by the data bytes, or `nil` if it cannot be encoded.
+    public var bytesValue: [UInt8]? {
+        guard let statusByte,
+              let dataBytes
+        else { return nil }
+
+        return [statusByte] + dataBytes
+    }
 }
 
 // MARK: - Sendable

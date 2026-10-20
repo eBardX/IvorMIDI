@@ -11,6 +11,14 @@ struct MIDISystemMessageTests {
 
 extension MIDISystemMessageTests {
     @Test
+    func bytesValue() {
+        #expect(MIDISystemMessage.timingClock.bytesValue == [0xf8])
+        #expect(MIDISystemMessage.songPosition(8_192).bytesValue == [0xf2, 0x00, 0x40])
+        #expect(MIDISystemMessage.songSelect(5).bytesValue == [0xf3, 0x05])
+        #expect(MIDISystemMessage.systemExclusive([0x7e, 0x7f, 0xf7]).bytesValue == [0xf0, 0x7e, 0x7f, 0xf7])
+    }
+
+    @Test
     func dataBytes_activeSensing() {
         let msg = MIDISystemMessage(statusByte: 0xfe, dataBytes: [])
 
@@ -103,6 +111,38 @@ extension MIDISystemMessageTests {
     }
 
     @Test
+    func expectedDataByteCount() {
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf1) == 1)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf2) == 2)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf3) == 1)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf6) == 0)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf7) == 0)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf8) == 0)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xff) == 0)
+    }
+
+    @Test
+    func expectedDataByteCount_matchesInit() {
+        for statusByte in UInt8(0xf1)...0xff {
+            guard let count = MIDISystemMessage.expectedDataByteCount(for: statusByte)
+            else { continue }
+
+            #expect(MIDISystemMessage(statusByte: statusByte,
+                                      dataBytes: Array(repeating: 0, count: count)) != nil)
+        }
+    }
+
+    @Test
+    func expectedDataByteCount_nil() {
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0x90) == nil)  // channel status
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf0) == nil)  // system exclusive
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf4) == nil)  // undefined
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf5) == nil)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xf9) == nil)
+        #expect(MIDISystemMessage.expectedDataByteCount(for: 0xfd) == nil)
+    }
+
+    @Test
     func hashable() {
         let msg1 = MIDISystemMessage(statusByte: 0xf1, dataBytes: [0x30])!  // swiftlint:disable:this force_unwrapping
         let msg2 = MIDISystemMessage(statusByte: 0xf1, dataBytes: [0x30])!  // swiftlint:disable:this force_unwrapping
@@ -136,6 +176,21 @@ extension MIDISystemMessageTests {
         } else {
             Issue.record("Expected activeSensing")
         }
+    }
+
+    @Test
+    func init_bytesValue() {
+        #expect(MIDISystemMessage(bytesValue: [0xf8]) == .timingClock)
+        #expect(MIDISystemMessage(bytesValue: [0xf2, 0x00, 0x40]) == .songPosition(8_192))
+        #expect(MIDISystemMessage(bytesValue: [0xf0, 0x7e, 0x7f, 0xf7]) == .systemExclusive([0x7e, 0x7f, 0xf7]))
+    }
+
+    @Test
+    func init_bytesValue_invalid() {
+        #expect(MIDISystemMessage(bytesValue: []) == nil)
+        #expect(MIDISystemMessage(bytesValue: [0xf8, 0x00]) == nil)
+        #expect(MIDISystemMessage(bytesValue: [0xf0, 0x7e]) == nil)
+        #expect(MIDISystemMessage(bytesValue: [0x90, 0x3c, 0x64]) == nil)
     }
 
     @Test
@@ -179,6 +234,17 @@ extension MIDISystemMessageTests {
     }
 
     @Test
+    func init_invalid_eoxWithData() {
+        #expect(MIDISystemMessage(statusByte: 0xf7, dataBytes: [0x00]) == nil)
+    }
+
+    @Test
+    func init_invalid_mtcQuarterFrameWrongDataByteCount() {
+        #expect(MIDISystemMessage(statusByte: 0xf1, dataBytes: []) == nil)
+        #expect(MIDISystemMessage(statusByte: 0xf1, dataBytes: [0x30, 0x00]) == nil)
+    }
+
+    @Test
     func init_invalid_nonSystemStatus() {
         #expect(MIDISystemMessage(statusByte: 0x90, dataBytes: []) == nil)
     }
@@ -192,6 +258,18 @@ extension MIDISystemMessageTests {
     @Test
     func init_invalid_realTimeWithData() {
         #expect(MIDISystemMessage(statusByte: 0xf8, dataBytes: [0x00]) == nil)
+    }
+
+    @Test
+    func init_invalid_songPositionWrongDataByteCount() {
+        #expect(MIDISystemMessage(statusByte: 0xf2, dataBytes: [0x00]) == nil)
+        #expect(MIDISystemMessage(statusByte: 0xf2, dataBytes: [0x00, 0x01, 0x02]) == nil)
+    }
+
+    @Test
+    func init_invalid_songSelectWrongDataByteCount() {
+        #expect(MIDISystemMessage(statusByte: 0xf3, dataBytes: []) == nil)
+        #expect(MIDISystemMessage(statusByte: 0xf3, dataBytes: [0x05, 0x00]) == nil)
     }
 
     @Test

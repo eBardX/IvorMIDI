@@ -14,6 +14,9 @@ polyphonic and channel pressure, control change, program change, and pitch
 bend change; system messages cover system exclusive, system common, and system
 real-time messages. Every message and data value can be converted to and from
 its [MIDI 1.0](https://midi.org/midi-1-0) wire encoding.
+Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
+sensitivity and fine tuning, can be set with a single call that builds the
+whole control change sequence.
 
 ```swift
 import IvorMIDI
@@ -31,8 +34,8 @@ let decoded = MIDIChannelMessage(statusByte: 0x90,
 decoded == noteOn   // true
 ```
 
-Every public type is a `Sendable` value type, so instances can be freely shared
-across tasks and actor boundaries.
+Every public message and data value type is a `Sendable` value type, so
+instances can be freely shared across tasks and actor boundaries.
 
 ## Topics
 
@@ -47,7 +50,10 @@ across tasks and actor boundaries.
 - ``MIDIController``
 - ``MIDIData1Value``
 - ``MIDIData2Value``
+- ``MIDINonRegisteredParameter``
 - ``MIDIPitchBend``
+- ``MIDIProgram``
+- ``MIDIRegisteredParameter``
 
 ### Encoding
 

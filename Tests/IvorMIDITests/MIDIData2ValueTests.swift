@@ -87,10 +87,29 @@ extension MIDIData2ValueTests {
     }
 
     @Test
+    func init_clamping() {
+        #expect(MIDIData2Value(clamping: -1).uintValue == 0)
+        #expect(MIDIData2Value(clamping: 0).uintValue == 0)
+        #expect(MIDIData2Value(clamping: 8_192).uintValue == 8_192)
+        #expect(MIDIData2Value(clamping: 16_383).uintValue == 16_383)
+        #expect(MIDIData2Value(clamping: 16_384).uintValue == 16_383)
+        #expect(MIDIData2Value(clamping: Int.min).uintValue == 0)
+        #expect(MIDIData2Value(clamping: UInt.max).uintValue == 16_383)
+    }
+
+    @Test
     func init_integerLiteral() {
         let value: MIDIData2Value = 128
 
         #expect(value.uintValue == 128)
+    }
+
+    @Test
+    func init_msb_lsb() {
+        #expect(MIDIData2Value(msb: 0, lsb: 0).uintValue == 0)
+        #expect(MIDIData2Value(msb: 0x40, lsb: 0).uintValue == 8_192)
+        #expect(MIDIData2Value(msb: 0x01, lsb: 0x02).uintValue == 130)
+        #expect(MIDIData2Value(msb: 0x7f, lsb: 0x7f).uintValue == 16_383)
     }
 
     @Test
@@ -111,6 +130,31 @@ extension MIDIData2ValueTests {
         #expect(MIDIData2Value.isValid(8_192))
         #expect(MIDIData2Value.isValid(16_383))
         #expect(!MIDIData2Value.isValid(16_384))
+    }
+
+    @Test
+    func lsb() {
+        #expect((0 as MIDIData2Value).lsb == 0)
+        #expect((130 as MIDIData2Value).lsb == 0x02)
+        #expect((8_192 as MIDIData2Value).lsb == 0)
+        #expect((16_383 as MIDIData2Value).lsb == 0x7f)
+    }
+
+    @Test
+    func msb() {
+        #expect((0 as MIDIData2Value).msb == 0)
+        #expect((130 as MIDIData2Value).msb == 0x01)
+        #expect((8_192 as MIDIData2Value).msb == 0x40)
+        #expect((16_383 as MIDIData2Value).msb == 0x7f)
+    }
+
+    @Test
+    func msb_lsb_roundTrip() {
+        for uintValue in UInt(0)...16_383 {
+            let value = MIDIData2Value(clamping: uintValue)
+
+            #expect(MIDIData2Value(msb: value.msb, lsb: value.lsb) == value)
+        }
     }
 
     @Test

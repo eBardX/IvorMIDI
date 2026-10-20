@@ -8,6 +8,15 @@ public struct MIDIChannel {
     // MARK: Public Initializers
 
     /// Creates a `MIDIChannel` instance with the provided channel number,
+    /// clamped to the valid range.
+    ///
+    /// - Parameter value:  The channel number. A value below 1 becomes 1; a
+    ///                     value above 16 becomes 16.
+    public init(clamping value: some BinaryInteger) {
+        self.uintValue = UInt(value.clamped(to: 1...16))
+    }
+
+    /// Creates a `MIDIChannel` instance with the provided channel number,
     /// or `nil` if the value is not a valid channel number.
     ///
     /// - Parameter uintValue:  The channel number. Must be in the range

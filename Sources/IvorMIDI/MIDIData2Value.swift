@@ -7,6 +7,25 @@ public struct MIDIData2Value {
 
     // MARK: Public Initializers
 
+    /// Creates a `MIDIData2Value` instance with the provided value, clamped
+    /// to the valid range.
+    ///
+    /// - Parameter value:  The data value. A value below 0 becomes 0; a value
+    ///                     above 16,383 becomes 16,383.
+    public init(clamping value: some BinaryInteger) {
+        self.uintValue = UInt(value.clamped(to: 0...16_383))
+    }
+
+    /// Creates a `MIDIData2Value` instance from its most and least
+    /// significant 7 bits.
+    ///
+    /// - Parameter msb:    The most significant 7 bits.
+    /// - Parameter lsb:    The least significant 7 bits.
+    public init(msb: MIDIData1Value,
+                lsb: MIDIData1Value) {
+        self.uintValue = (msb.uintValue << 7) | lsb.uintValue
+    }
+
     /// Creates a `MIDIData2Value` instance with the provided value, or
     /// `nil` if the value is not in the valid range.
     ///
@@ -40,6 +59,20 @@ extension MIDIData2Value {
     ///             `false`.
     public static func isValid(_ uintValue: UInt) -> Bool {
         (0...16_383).contains(uintValue)
+    }
+
+    // MARK: Public Instance Properties
+
+    /// The least significant 7 bits of this data value, as sent by the LSB
+    /// half of a pair of controllers such as data entry or bank select.
+    public var lsb: MIDIData1Value {
+        MIDIData1Value(clamping: uintValue & 0x7f)
+    }
+
+    /// The most significant 7 bits of this data value, as sent by the MSB
+    /// half of a pair of controllers such as data entry or bank select.
+    public var msb: MIDIData1Value {
+        MIDIData1Value(clamping: uintValue >> 7)
     }
 }
 

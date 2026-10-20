@@ -16,7 +16,10 @@ extension MIDIBytesConvertibleTests {
                                                   64 as MIDIController,
                                                   127 as MIDIData1Value,
                                                   16_383 as MIDIData2Value,
-                                                  -8_192 as MIDIPitchBend]
+                                                  128 as MIDIProgram,
+                                                  -8_192 as MIDIPitchBend,
+                                                  MIDIChannelMessage.noteOn(1, 60, 100),
+                                                  MIDISystemMessage.songPosition(8_192)]
 
         for value in values {
             let bytes = try #require(value.bytesValue)

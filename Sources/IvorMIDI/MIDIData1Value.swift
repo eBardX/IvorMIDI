@@ -7,6 +7,15 @@ public struct MIDIData1Value {
 
     // MARK: Public Initializers
 
+    /// Creates a `MIDIData1Value` instance with the provided value, clamped
+    /// to the valid range.
+    ///
+    /// - Parameter value:  The data value. A value below 0 becomes 0; a value
+    ///                     above 127 becomes 127.
+    public init(clamping value: some BinaryInteger) {
+        self.uintValue = UInt(value.clamped(to: 0...127))
+    }
+
     /// Creates a `MIDIData1Value` instance with the provided value, or
     /// `nil` if the value is not in the valid range.
     ///

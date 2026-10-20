@@ -11,6 +11,14 @@ struct MIDIChannelMessageTests {
 
 extension MIDIChannelMessageTests {
     @Test
+    func bytesValue() {
+        #expect(MIDIChannelMessage.noteOn(1, 60, 100).bytesValue == [0x90, 0x3c, 0x64])
+        #expect(MIDIChannelMessage.controlChange(16, .sustain, 127).bytesValue == [0xbf, 0x40, 0x7f])
+        #expect(MIDIChannelMessage.programChange(3, 5).bytesValue == [0xc2, 0x04])
+        #expect(MIDIChannelMessage.pitchBendChange(1, 0).bytesValue == [0xe0, 0x00, 0x40])
+    }
+
+    @Test
     func channel() {
         let msg = MIDIChannelMessage(statusByte: 0x90,
                                      dataBytes: [0x3c, 0x64])
@@ -125,6 +133,21 @@ extension MIDIChannelMessageTests {
         let msg2 = MIDIChannelMessage(statusByte: 0x90, dataBytes: [0x3d, 0x64])!  // swiftlint:disable:this force_unwrapping
 
         #expect(msg1 != msg2)
+    }
+
+    @Test
+    func init_bytesValue() {
+        #expect(MIDIChannelMessage(bytesValue: [0x93, 0x3c, 0x64]) == .noteOn(4, 60, 100))
+        #expect(MIDIChannelMessage(bytesValue: [0xd1, 0x40]) == .channelPressure(2, 64))
+    }
+
+    @Test
+    func init_bytesValue_invalid() {
+        #expect(MIDIChannelMessage(bytesValue: []) == nil)
+        #expect(MIDIChannelMessage(bytesValue: [0x90]) == nil)
+        #expect(MIDIChannelMessage(bytesValue: [0x90, 0x3c]) == nil)
+        #expect(MIDIChannelMessage(bytesValue: [0xc0, 0x05, 0x00]) == nil)
+        #expect(MIDIChannelMessage(bytesValue: [0xf8]) == nil)
     }
 
     @Test
@@ -248,7 +271,7 @@ extension MIDIChannelMessageTests {
 
         if case let .programChange(channel, program) = msg {
             #expect(channel.uintValue == 1)
-            #expect(program.uintValue == 5)
+            #expect(program.uintValue == 6)       // wire value 5 is program 6
         } else {
             Issue.record("Expected programChange")
         }

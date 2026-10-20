@@ -95,6 +95,17 @@ extension MIDIChannelTests {
     }
 
     @Test
+    func init_clamping() {
+        #expect(MIDIChannel(clamping: 0).uintValue == 1)
+        #expect(MIDIChannel(clamping: 1).uintValue == 1)
+        #expect(MIDIChannel(clamping: 10).uintValue == 10)
+        #expect(MIDIChannel(clamping: 16).uintValue == 16)
+        #expect(MIDIChannel(clamping: 17).uintValue == 16)
+        #expect(MIDIChannel(clamping: Int.min).uintValue == 1)
+        #expect(MIDIChannel(clamping: UInt.max).uintValue == 16)
+    }
+
+    @Test
     func init_integerLiteral() {
         let value: MIDIChannel = 3
 

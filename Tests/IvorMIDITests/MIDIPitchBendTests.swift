@@ -97,6 +97,17 @@ extension MIDIPitchBendTests {
     }
 
     @Test
+    func init_clamping() {
+        #expect(MIDIPitchBend(clamping: -8_193).intValue == -8_192)
+        #expect(MIDIPitchBend(clamping: -8_192).intValue == -8_192)
+        #expect(MIDIPitchBend(clamping: 0).intValue == 0)
+        #expect(MIDIPitchBend(clamping: 8_191).intValue == 8_191)
+        #expect(MIDIPitchBend(clamping: 8_192).intValue == 8_191)
+        #expect(MIDIPitchBend(clamping: Int.min).intValue == -8_192)
+        #expect(MIDIPitchBend(clamping: UInt.max).intValue == 8_191)
+    }
+
+    @Test
     func init_integerLiteral() {
         let value: MIDIPitchBend = -100
 

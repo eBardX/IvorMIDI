@@ -1,5 +1,7 @@
 // © 2025–2026 John Gary Pusey (see LICENSE.md)
 
+internal import XestiTools
+
 /// A MIDI channel voice or mode message.
 public enum MIDIChannelMessage {
 
@@ -22,7 +24,7 @@ public enum MIDIChannelMessage {
     case polyphonicPressure(MIDIChannel, MIDIData1Value, MIDIData1Value)
 
     /// A program change message.
-    case programChange(MIDIChannel, MIDIData1Value)
+    case programChange(MIDIChannel, MIDIProgram)
 
     // MARK: Public Initializers
 
@@ -71,7 +73,7 @@ public enum MIDIChannelMessage {
             self = .controlChange(channel, controller, controlValue)
 
         case 0xc0:
-            guard let program = MIDIData1Value(bytesValue: [dataBytes[0]])
+            guard let program = MIDIProgram(bytesValue: [dataBytes[0]])
             else { return nil }
 
             self = .programChange(channel, program)
@@ -244,6 +246,37 @@ extension MIDIChannelMessage: Equatable {
 // MARK: - Hashable
 
 extension MIDIChannelMessage: Hashable {
+}
+
+// MARK: - MIDIBytesConvertible
+
+extension MIDIChannelMessage: MIDIBytesConvertible {
+
+    // MARK: Public Initializers
+
+    /// Creates a `MIDIChannelMessage` instance from its complete MIDI wire
+    /// encoding, or `nil` if the bytes do not encode a valid channel message.
+    ///
+    /// - Parameter bytesValue: The status byte followed by the data bytes.
+    public init?(bytesValue: [UInt8]) {
+        guard let statusByte = bytesValue.first
+        else { return nil }
+
+        self.init(statusByte: statusByte,
+                  dataBytes: Array(bytesValue.dropFirst()))
+    }
+
+    // MARK: Public Instance Properties
+
+    /// The complete MIDI wire encoding of this message: the status byte
+    /// followed by the data bytes, or `nil` if it cannot be encoded.
+    public var bytesValue: [UInt8]? {
+        guard let statusByte,
+              let dataBytes
+        else { return nil }
+
+        return [statusByte] + dataBytes
+    }
 }
 
 // MARK: - Sendable

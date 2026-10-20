@@ -24,6 +24,9 @@ polyphonic and channel pressure, control change, program change, and pitch
 bend change; system messages cover system exclusive, system common, and system
 real-time messages. Every message and data value can be converted to and from
 its [MIDI 1.0][midi1] wire encoding.
+Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
+sensitivity and fine tuning, can be set with a single call that builds the
+whole control change sequence.
 
 ## <a name="requirements">Requirements</a>
 
@@ -43,7 +46,7 @@ To add IvorMIDI to a Swift package, add it to the `dependencies` in your
 ```swift
 dependencies: [
     .package(url: "https://github.com/eBardX/IvorMIDI.git",
-             .upToNextMajor(from: "2.0.0"))
+             .upToNextMinor(from: "0.2.0"))
 ]
 ```
 

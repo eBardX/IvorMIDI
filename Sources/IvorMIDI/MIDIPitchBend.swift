@@ -7,6 +7,15 @@ public struct MIDIPitchBend {
 
     // MARK: Public Initializers
 
+    /// Creates a `MIDIPitchBend` instance with the provided value, clamped
+    /// to the valid range.
+    ///
+    /// - Parameter value:  The pitch bend value. A value below -8,192 becomes
+    ///                     -8,192; a value above 8,191 becomes 8,191.
+    public init(clamping value: some BinaryInteger) {
+        self.intValue = value.clamped(to: -8_192...8_191)
+    }
+
     /// Creates a `MIDIPitchBend` instance with the provided value, or
     /// `nil` if the value is not in the valid range.
     ///
