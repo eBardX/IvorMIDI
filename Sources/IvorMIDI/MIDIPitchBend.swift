@@ -7,6 +7,33 @@ public struct MIDIPitchBend {
 
     // MARK: Public Initializers
 
+    /// Creates a `MIDIPitchBend` instance that bends by the provided number
+    /// of cents on a synthesizer with the provided pitch bend sensitivity, or
+    /// `nil` if either value is not usable.
+    ///
+    /// The bend uses the full 14-bit resolution: the sensitivity maps to the
+    /// ends of the range, so that `-sensitivity` cents is -8,192 and
+    /// `sensitivity` cents is 8,191, and the result is rounded to the nearest
+    /// value. A bend beyond the sensitivity is clamped to the range. Set the
+    /// synthesizer’s sensitivity with
+    /// ``MIDIRegisteredParameter/pitchBendSensitivity``.
+    ///
+    /// - Parameter cents:          The bend, in cents. Must be finite.
+    /// - Parameter sensitivity:    The synthesizer’s pitch bend sensitivity,
+    ///                             in cents. Must be finite and greater than
+    ///                             0.
+    public init?(cents: Double,
+                 sensitivity: Double) {
+        guard cents.isFinite,
+              sensitivity.isFinite,
+              sensitivity > 0
+        else { return nil }
+
+        let value = (cents * 8_192 / sensitivity).rounded()
+
+        self.init(clamping: Int(min(max(value, -8_192), 8_191)))
+    }
+
     /// Creates a `MIDIPitchBend` instance with the provided value, clamped
     /// to the valid range.
     ///

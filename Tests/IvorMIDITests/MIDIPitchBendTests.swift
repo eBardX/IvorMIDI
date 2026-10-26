@@ -96,6 +96,30 @@ extension MIDIPitchBendTests {
         #expect(MIDIPitchBend(bytesValue: [0x00, 0x00, 0x00]) == nil)
     }
 
+    @Test(arguments: [(0, 0), (50, 4_096), (-100, -8_192), (100, 8_191), (1, 82), (-1, -82), (0.5, 41)] as [(Double, Int)])
+    func init_cents_roundsToFullRange(cents: Double, value: Int) {
+        #expect(MIDIPitchBend(cents: cents, sensitivity: 100)?.intValue == value)
+    }
+
+    @Test
+    func init_cents_beyondSensitivity_clamps() {
+        #expect(MIDIPitchBend(cents: 250, sensitivity: 200)?.intValue == 8_191)
+        #expect(MIDIPitchBend(cents: -250, sensitivity: 200)?.intValue == -8_192)
+        #expect(MIDIPitchBend(cents: 1e300, sensitivity: 1)?.intValue == 8_191)
+    }
+
+    @Test
+    func init_cents_bytesValue() {
+        #expect(MIDIPitchBend(cents: 0, sensitivity: 200)?.bytesValue == [0x00, 0x40])
+        #expect(MIDIPitchBend(cents: -200, sensitivity: 200)?.bytesValue == [0x00, 0x00])
+        #expect(MIDIPitchBend(cents: 200, sensitivity: 200)?.bytesValue == [0x7f, 0x7f])
+    }
+
+    @Test(arguments: [(Double.nan, 200), (.infinity, 200), (100, 0), (100, -200), (100, .nan), (100, .infinity)] as [(Double, Double)])
+    func init_cents_unusable(cents: Double, sensitivity: Double) {
+        #expect(MIDIPitchBend(cents: cents, sensitivity: sensitivity) == nil)
+    }
+
     @Test
     func init_clamping() {
         #expect(MIDIPitchBend(clamping: -8_193).intValue == -8_192)

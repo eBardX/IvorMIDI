@@ -18,7 +18,9 @@ Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
 whole control change sequence. Universal system exclusive messages
 for master volume, master tuning, and scale/octave tuning are built the same
-way.
+way, as are the bank select and program change messages that set a channel
+to a ``MIDIPatch``. A ``MIDIPitchBend`` can be made from a bend in cents and
+the synthesizer’s pitch bend sensitivity.
 
 ```swift
 import IvorMIDI
