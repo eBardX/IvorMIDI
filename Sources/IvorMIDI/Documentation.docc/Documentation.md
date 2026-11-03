@@ -14,13 +14,14 @@ polyphonic and channel pressure, control change, program change, and pitch
 bend change; system messages cover system exclusive, system common, and system
 real-time messages. Every message and data value can be converted to and from
 its [MIDI 1.0](https://midi.org/midi-1-0) wire encoding.
+
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
-whole control change sequence. Universal system exclusive messages
-for master volume, master tuning, and scale/octave tuning are built the same
-way, as are the bank select and program change messages that set a channel
-to a ``MIDIPatch``. A ``MIDIPitchBend`` can be made from a bend in cents and
-the synthesizer’s pitch bend sensitivity.
+whole control change sequence. Universal system exclusive messages for master
+volume, master tuning, and scale/octave tuning are built the same way, as are
+the bank select and program change messages that set a channel to a
+``MIDIPatch``. A ``MIDIPitchBend`` can be made from a bend in cents and the
+synthesizer’s pitch bend sensitivity.
 
 ```swift
 import IvorMIDI
@@ -38,10 +39,14 @@ let decoded = MIDIChannelMessage(statusByte: 0x90,
 decoded == noteOn   // true
 ```
 
-Every public message and data value type is a `Sendable` value type, so
-instances can be freely shared across tasks and actor boundaries.
+See <doc:UsingIvorMIDI> for a full guide to the messages, the data values, and
+the wire encoding.
 
 ## Topics
+
+### Guides
+
+- <doc:UsingIvorMIDI>
 
 ### Messages
 
@@ -58,6 +63,11 @@ instances can be freely shared across tasks and actor boundaries.
 - ``MIDIPitchBend``
 - ``MIDIProgram``
 - ``MIDIRegisteredParameter``
+
+### Patches
+
+- ``MIDIBank``
+- ``MIDIPatch``
 
 ### Encoding
 

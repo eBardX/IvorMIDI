@@ -12,6 +12,7 @@ MIDI channel message, system message, and data value types.
 * [Installation](#installation)
     * [Swift Package Manager](#spm_installation)
 * [Quick Start](#quick_start)
+* [Documentation](#documentation)
 * [Reference Documentation](#reference_documentation)
 * [Credits](#credits)
 * [License](#license)
@@ -24,11 +25,14 @@ polyphonic and channel pressure, control change, program change, and pitch
 bend change; system messages cover system exclusive, system common, and system
 real-time messages. Every message and data value can be converted to and from
 its [MIDI 1.0][midi1] wire encoding.
+
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
-whole control change sequence. Universal system exclusive messages
-for master volume, master tuning, and scale/octave tuning are built the same
-way.
+whole control change sequence. Universal system exclusive messages for master
+volume, master tuning, and scale/octave tuning are built the same way, as are
+the bank select and program change messages that set a channel to a
+`MIDIPatch`. A `MIDIPitchBend` can be made from a bend in cents and the
+synthesizer's pitch bend sensitivity.
 
 ## <a name="requirements">Requirements</a>
 
@@ -48,7 +52,7 @@ To add IvorMIDI to a Swift package, add it to the `dependencies` in your
 ```swift
 dependencies: [
     .package(url: "https://github.com/eBardX/IvorMIDI.git",
-             .upToNextMinor(from: "0.2.0"))
+             .upToNextMinor(from: "0.4.0"))
 ]
 ```
 
@@ -90,6 +94,16 @@ let decoded = MIDIChannelMessage(statusByte: 0x90,
 decoded == noteOn   // true
 ```
 
+For the complete story — the data values, the parameter and patch builders,
+universal system exclusive messages, and the wire encoding — see the [usage
+guide][guide].
+
+## <a name="documentation">Documentation</a>
+
+* [Using IvorMIDI][guide] — a guide to using the public API, published as part
+  of the DocC documentation.
+* Every public declaration carries a DocC comment.
+
 ## <a name="reference_documentation">Reference Documentation</a>
 
 Full [reference documentation][refdoc] is available courtesy of [DocC][docc].
@@ -103,6 +117,7 @@ John Gary Pusey (ebardx@gmail.com)
 IvorMIDI is available under [the MIT license][license].
 
 [docc]:         https://www.swift.org/documentation/docc/
+[guide]:        https://eBardX.github.io/ivor-packages-docs/documentation/ivormidi/usingivormidi
 [license]:      https://github.com/eBardX/IvorMIDI/blob/main/LICENSE.md
 [midi1]:        https://midi.org/midi-1-0
 [refdoc]:       https://eBardX.github.io/ivor-packages-docs/documentation/ivormidi
