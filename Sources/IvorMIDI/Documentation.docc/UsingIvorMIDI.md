@@ -22,6 +22,11 @@ family of small data value types that each validate their own range:
  ``MIDINonRegisteredParameter``    | A non-registered parameter number (0–16,383)
  ``MIDIBank``                      | A bank number (0–16,383)
  ``MIDIPatch``                     | A program and, optionally, its bank
+ ``MIDITuningMessage``             | A decoded MIDI Tuning message
+ ``MIDITuningFrequency``           | A frequency in the MIDI Tuning format
+ ``MIDITuningChange``              | A retuning of one key
+ ``MIDITuningLocation``            | A tuning program and, optionally, its bank
+ ``MIDITuningOffsets``             | The tuning offsets of the 12 notes of the octave
 
 Messages are values, so building one is just naming its case:
 
@@ -126,13 +131,84 @@ system exclusive messages addressed to all devices are built for you:
 ```swift
 let volume = MIDISystemMessage.masterVolume(16_383)         // full volume
 let tuning = MIDISystemMessage.masterCoarseTuning(64)       // A440
-let scale  = MIDISystemMessage.scaleOctaveTuning(channels: [1, 2],
-                                                 offsets: Array(repeating: 64,
-                                                                count: 12))
 ```
 
-``MIDISystemMessage/scaleOctaveTuning(channels:offsets:realTime:)`` returns
-`nil` unless it is given exactly 12 offsets, one for each note from C to B.
+## MIDI tuning
+
+The messages of the *MIDI Tuning Messages* specification (the MIDI Tuning
+Standard, with its CA-020, CA-021, and RP-020 extensions) are built by
+``MIDISystemMessage`` type methods. They address all devices unless you
+provide a `deviceID:`. Unlike ``MIDIProgram``, tuning programs and banks are
+numbered from 0, as they appear on the wire (0–127).
+
+ Message                                           | Method
+:----                                              |:----
+ Bulk tuning dump request, with or without a bank  | `bulkTuningDumpRequest`
+ Bulk tuning dump                                  | `bulkTuningDump`
+ Key-based tuning dump                             | `keyBasedTuningDump`
+ Scale/octave tuning dump, 1 or 2 byte format      | `scaleOctaveTuningDump`
+ Single note tuning change, with or without a bank | `singleNoteTuningChange`
+ Scale/octave tuning, 1 or 2 byte form             | `scaleOctaveTuning`
+
+Key-based messages give keys absolute frequencies as
+``MIDITuningFrequency`` values, which you can make from a frequency in hertz
+or from a semitone and a fraction of a semitone.
+``MIDITuningFrequency/noChange`` leaves a key as it is:
+
+```swift
+// Retune key 69 to 442 Hz in tuning program 0, even while it sounds.
+let change = MIDISystemMessage.singleNoteTuningChange(
+    [MIDITuningChange(key: 69, frequency: MIDITuningFrequency(hertz: 442)!)],
+    program: 0
+)
+```
+
+Scale/octave messages give the 12 notes from C to B offsets from the selected
+preset, or from equal temperament if there is none, as a
+``MIDITuningOffsets`` value. ``MIDITuningOffsets/coarse(_:)`` is the 1-byte
+form, in whole cents from −64 to +63; ``MIDITuningOffsets/fine(_:)`` is the
+2-byte form, about ±100 cents in steps of about 0.012 cents:
+
+```swift
+let offsets = [MIDIData1Value](repeating: 64, count: 12)
+let scale   = MIDISystemMessage.scaleOctaveTuning(channels: [1, 2],
+                                                  offsets: .coarse(offsets))
+```
+
+Each scale/octave message replaces the offsets of the last one rather than
+adding to them. To start from equal temperament on a device with tuning
+presets, RP-020 recommends selecting bank 0, program 0 first.
+
+These methods return `nil` if they are given the wrong number of elements, or
+a tuning name that is not ASCII or is longer than 16 characters. A shorter
+name is padded with spaces.
+
+To make a stored tuning the active one on a channel, set the
+``MIDIRegisteredParameter/tuningBankSelect`` and
+``MIDIRegisteredParameter/tuningProgramChange`` registered parameters:
+
+```swift
+let select = MIDIChannelMessage.registeredParameterChange(.tuningProgramChange,
+                                                          msb: 5,
+                                                          on: 1)
+```
+
+To read a tuning message, such as a device’s reply to a dump request, decode
+it with ``MIDITuningMessage``. Its ``MIDITuningMessage/content`` holds what
+the message says, and its ``MIDITuningMessage/systemMessage`` encodes it
+again, so you can edit a tuning and send it back:
+
+```swift
+if let tuning = MIDITuningMessage(reply),
+   case let .keyBasedDump(location, name, frequencies) = tuning.content {
+    // Use the tuning.
+}
+```
+
+The decoder returns `nil` for anything that is not a valid tuning message,
+including a key-based or scale/octave tuning dump with a wrong checksum. It
+does not check the checksum of a bulk tuning dump, because manufacturers have
+calculated it differently and the specification lets receivers ignore it.
 
 ## Wire encoding
 
@@ -143,9 +219,9 @@ bytes are the wrong number for the status byte, or are not valid data bytes;
 `expectedDataByteCount(for:)` tells you how many a status byte takes, which
 helps when reading a byte stream.
 
-The messages and the single-number data value types also adopt
-``MIDIBytesConvertible``, which converts a value to and from one array of
-bytes — for a message, the status byte followed by the data bytes:
+The messages, the single-number data value types, and ``MIDITuningOffsets``
+also adopt ``MIDIBytesConvertible``, which converts a value to and from one
+array of bytes — for a message, the status byte followed by the data bytes:
 
 ```swift
 MIDIChannelMessage.noteOn(1, 60, 100).bytesValue    // [0x90, 0x3C, 0x64]
@@ -158,10 +234,10 @@ Other packages adopt ``MIDIBytesConvertible`` for their own binary encodings.
 
 IvorMIDI throws no errors. Every conversion that can fail returns `nil`
 instead: the failable initializers of the data value types, the
-`init?(statusByte:dataBytes:)` and `init?(bytesValue:)` decoders, and
-``MIDISystemMessage/scaleOctaveTuning(channels:offsets:realTime:)``. An
-integer literal out of range stops execution, so use a failable initializer
-for any value you have not checked.
+`init?(statusByte:dataBytes:)` and `init?(bytesValue:)` decoders, the MIDI
+tuning builders, and ``MIDITuningMessage``. An integer literal out of range
+stops execution, so use a failable initializer for any value you have not
+checked.
 
 ## Concurrency
 

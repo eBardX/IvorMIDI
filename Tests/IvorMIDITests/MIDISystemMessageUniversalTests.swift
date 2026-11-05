@@ -54,45 +54,4 @@ extension MIDISystemMessageUniversalTests {
         #expect(MIDISystemMessage(statusByte: 0xf0,
                                   dataBytes: message.dataBytes ?? []) == message)
     }
-
-    @Test
-    func scaleOctaveTuning() {
-        let offsets: [MIDIData1Value] = [0x40, 0x3e, 0x40, 0x42, 0x40, 0x40, 0x3e, 0x40, 0x3e, 0x40, 0x42, 0x40]
-        let message = MIDISystemMessage.scaleOctaveTuning(channels: [1], offsets: offsets)
-
-        #expect(message?.dataBytes == [0x7e, 0x7f, 0x08, 0x08, 0x00, 0x00, 0x01]
-                                      + [0x40, 0x3e, 0x40, 0x42, 0x40, 0x40, 0x3e, 0x40, 0x3e, 0x40, 0x42, 0x40]
-                                      + [0xf7])
-    }
-
-    @Test
-    func scaleOctaveTuning_channelBits() {
-        let offsets = [MIDIData1Value](repeating: 0x40, count: 12)
-        let channelBytes = { (channels: [MIDIChannel]) in
-            MIDISystemMessage.scaleOctaveTuning(channels: channels, offsets: offsets)?.dataBytes?[4...6].map(\.self)
-        }
-
-        #expect(channelBytes([]) == [0x00, 0x00, 0x00])
-        #expect(channelBytes([7]) == [0x00, 0x00, 0x40])
-        #expect(channelBytes([8]) == [0x00, 0x01, 0x00])
-        #expect(channelBytes([14]) == [0x00, 0x40, 0x00])
-        #expect(channelBytes([15, 16]) == [0x03, 0x00, 0x00])
-        #expect(channelBytes((1...16).compactMap { MIDIChannel(uintValue: $0) }) == [0x03, 0x7f, 0x7f])
-    }
-
-    @Test
-    func scaleOctaveTuning_realTime() {
-        let offsets = [MIDIData1Value](repeating: 0x40, count: 12)
-        let message = MIDISystemMessage.scaleOctaveTuning(channels: [10], offsets: offsets, realTime: true)
-
-        #expect(message?.dataBytes?.prefix(7) == [0x7f, 0x7f, 0x08, 0x08, 0x00, 0x04, 0x00])
-    }
-
-    @Test
-    func scaleOctaveTuning_wrongOffsetCount() {
-        let offsets = [MIDIData1Value](repeating: 0x40, count: 11)
-
-        #expect(MIDISystemMessage.scaleOctaveTuning(channels: [1], offsets: offsets) == nil)
-        #expect(MIDISystemMessage.scaleOctaveTuning(channels: [1], offsets: offsets + [0x40, 0x40]) == nil)
-    }
 }

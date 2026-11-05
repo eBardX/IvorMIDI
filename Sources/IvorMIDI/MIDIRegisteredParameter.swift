@@ -55,9 +55,24 @@ extension MIDIRegisteredParameter {
     public static let pitchBendSensitivity = Self(0)
 
     /// The tuning bank select parameter (0, 4).
+    ///
+    /// This is “Tuning Bank Select” in the *MIDI Tuning Messages*
+    /// specification. It is kept separate from the bank select controller,
+    /// and takes a 7-bit bank number (0–127, which the specification also
+    /// describes as 1–128), so set it with
+    /// ``MIDIChannelMessage/registeredParameterChange(_:msb:on:)``. A device
+    /// ignores a bank it does not have.
     public static let tuningBankSelect = Self(4)
 
     /// The tuning program change parameter (0, 3).
+    ///
+    /// This is “Tuning Program Select” in the *MIDI Tuning Messages*
+    /// specification. It makes a stored tuning the active one, immediately
+    /// and without audible artifacts on notes that are sounding. It takes a
+    /// 7-bit program number (0–127, which the specification also describes as
+    /// 1–128), so set it with
+    /// ``MIDIChannelMessage/registeredParameterChange(_:msb:on:)``. A device
+    /// ignores a program it does not have.
     public static let tuningProgramChange = Self(3)
 
     // MARK: Public Type Methods

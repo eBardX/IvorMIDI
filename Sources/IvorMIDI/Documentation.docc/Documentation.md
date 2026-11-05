@@ -18,10 +18,11 @@ its [MIDI 1.0](https://midi.org/midi-1-0) wire encoding.
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
 whole control change sequence. Universal system exclusive messages for master
-volume, master tuning, and scale/octave tuning are built the same way, as are
-the bank select and program change messages that set a channel to a
-``MIDIPatch``. A ``MIDIPitchBend`` can be made from a bend in cents and the
-synthesizer’s pitch bend sensitivity.
+volume, master tuning, and all of the MIDI Tuning Standard are built the same
+way, as are the bank select and program change messages that set a channel to
+a ``MIDIPatch``. ``MIDITuningMessage`` decodes MIDI Tuning Standard messages.
+A ``MIDIPitchBend`` can be made from a bend in cents and the synthesizer’s
+pitch bend sensitivity.
 
 ```swift
 import IvorMIDI
@@ -52,6 +53,7 @@ the wire encoding.
 
 - ``MIDIChannelMessage``
 - ``MIDISystemMessage``
+- ``MIDITuningMessage``
 
 ### Data values
 
@@ -63,6 +65,10 @@ the wire encoding.
 - ``MIDIPitchBend``
 - ``MIDIProgram``
 - ``MIDIRegisteredParameter``
+- ``MIDITuningChange``
+- ``MIDITuningFrequency``
+- ``MIDITuningLocation``
+- ``MIDITuningOffsets``
 
 ### Patches
 

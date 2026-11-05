@@ -29,10 +29,11 @@ its [MIDI 1.0][midi1] wire encoding.
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
 whole control change sequence. Universal system exclusive messages for master
-volume, master tuning, and scale/octave tuning are built the same way, as are
-the bank select and program change messages that set a channel to a
-`MIDIPatch`. A `MIDIPitchBend` can be made from a bend in cents and the
-synthesizer's pitch bend sensitivity.
+volume, master tuning, and all of the MIDI Tuning Standard are built the same
+way, as are the bank select and program change messages that set a channel to
+a `MIDIPatch`. `MIDITuningMessage` decodes MIDI Tuning Standard messages. A
+`MIDIPitchBend` can be made from a bend in cents and the synthesizer's pitch
+bend sensitivity.
 
 ## <a name="requirements">Requirements</a>
 
@@ -95,8 +96,8 @@ decoded == noteOn   // true
 ```
 
 For the complete story — the data values, the parameter and patch builders,
-universal system exclusive messages, and the wire encoding — see the [usage
-guide][guide].
+universal system exclusive messages, MIDI tuning, and the wire encoding — see
+the [usage guide][guide].
 
 ## <a name="documentation">Documentation</a>
 
