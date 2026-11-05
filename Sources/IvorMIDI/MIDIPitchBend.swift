@@ -2,7 +2,7 @@
 
 public import XestiTools
 
-/// A MIDI pitch bend value (-8,192–8,191), where 0 is center.
+/// A MIDI pitch bend value (−8,192–8,191), where 0 is center.
 public struct MIDIPitchBend {
 
     // MARK: Public Initializers
@@ -12,7 +12,7 @@ public struct MIDIPitchBend {
     /// `nil` if either value is not usable.
     ///
     /// The bend uses the full 14-bit resolution: the sensitivity maps to the
-    /// ends of the range, so that `-sensitivity` cents is -8,192 and
+    /// ends of the range, so that `-sensitivity` cents is −8,192 and
     /// `sensitivity` cents is 8,191, and the result is rounded to the nearest
     /// value. A bend beyond the sensitivity is clamped to the range. Set the
     /// synthesizer’s sensitivity with
@@ -37,8 +37,8 @@ public struct MIDIPitchBend {
     /// Creates a `MIDIPitchBend` instance with the provided value, clamped
     /// to the valid range.
     ///
-    /// - Parameter value:  The pitch bend value. A value below -8,192 becomes
-    ///                     -8,192; a value above 8,191 becomes 8,191.
+    /// - Parameter value:  The pitch bend value. A value below −8,192 becomes
+    ///                     −8,192; a value above 8,191 becomes 8,191.
     public init(clamping value: some BinaryInteger) {
         self.intValue = value.clamped(to: -8_192...8_191)
     }
@@ -47,7 +47,7 @@ public struct MIDIPitchBend {
     /// `nil` if the value is not in the valid range.
     ///
     /// - Parameter intValue:   The pitch bend value. Must be in the range
-    ///                         -8,192–8,191.
+    ///                         −8,192–8,191.
     public init?(intValue: Int) {
         guard Self.isValid(intValue)
         else { return nil }
@@ -72,7 +72,7 @@ extension MIDIPitchBend {
     ///
     /// - Parameter intValue:   The value to validate.
     ///
-    /// - Returns:  `true` if the value is in the range -8,192–8,191;
+    /// - Returns:  `true` if the value is in the range −8,192–8,191;
     ///             otherwise, `false`.
     public static func isValid(_ intValue: Int) -> Bool {
         (-8_192...8_191).contains(intValue)

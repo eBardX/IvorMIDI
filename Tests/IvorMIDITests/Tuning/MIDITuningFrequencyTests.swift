@@ -60,15 +60,15 @@ extension MIDITuningFrequencyTests {
     }
 
     @Test
+    func hertz_noChange() {
+        #expect(MIDITuningFrequency.noChange.hertz == nil)
+    }
+
+    @Test
     func hertz_topOfRange() throws {
         let frequency = try #require(MIDITuningFrequency(bytesValue: [0x7f, 0x7f, 0x7e]))
 
         #expect(try abs(#require(frequency.hertz) - 13_289.6566) <= 0.0001)
-    }
-
-    @Test
-    func hertz_noChange() {
-        #expect(MIDITuningFrequency.noChange.hertz == nil)
     }
 
     @Test

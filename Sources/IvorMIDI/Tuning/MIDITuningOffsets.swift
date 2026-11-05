@@ -13,8 +13,8 @@ public enum MIDITuningOffsets {
     case coarse([MIDIData1Value])
 
     /// Offsets in the 2-byte format, in steps of about 0.012 cents, from −100
-    /// cents (0) through equal temperament (8192) to +100 × 8191/8192 cents
-    /// (16383).
+    /// cents (0) through equal temperament (8,192) to +100 × 8,191/8,192 cents
+    /// (16,383).
     case fine([MIDIData2Value])
 }
 

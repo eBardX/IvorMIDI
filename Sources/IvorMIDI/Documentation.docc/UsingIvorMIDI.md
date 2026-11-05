@@ -219,9 +219,11 @@ bytes are the wrong number for the status byte, or are not valid data bytes;
 `expectedDataByteCount(for:)` tells you how many a status byte takes, which
 helps when reading a byte stream.
 
-The messages, the single-number data value types, and ``MIDITuningOffsets``
-also adopt ``MIDIBytesConvertible``, which converts a value to and from one
-array of bytes — for a message, the status byte followed by the data bytes:
+``MIDIChannelMessage``, ``MIDISystemMessage``, ``MIDIChannel``,
+``MIDIController``, ``MIDIData1Value``, ``MIDIData2Value``, ``MIDIPitchBend``,
+``MIDIProgram``, ``MIDITuningFrequency``, and ``MIDITuningOffsets`` also adopt
+``MIDIBytesConvertible``, which converts a value to and from one array of
+bytes — for a message, the status byte followed by the data bytes:
 
 ```swift
 MIDIChannelMessage.noteOn(1, 60, 100).bytesValue    // [0x90, 0x3C, 0x64]

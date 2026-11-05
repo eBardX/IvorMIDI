@@ -29,8 +29,8 @@ extension MIDISystemMessage {
     /// 2 device should not retune rhythm channels.
     ///
     /// - Parameter tuning: The tuning, from −100 cents (0) through A440
-    ///                     (8192, the default) to +100 × 8191/8192 cents
-    ///                     (16383).
+    ///                     (8,192, the default) to +100 × 8,191/8,192 cents
+    ///                     (16,383).
     ///
     /// - Returns:  The master fine tuning message.
     public static func masterFineTuning(_ tuning: MIDIData2Value) -> Self {
@@ -43,7 +43,7 @@ extension MIDISystemMessage {
     /// As with channel volume, the square of the value is proportional to the
     /// volume.
     ///
-    /// - Parameter volume: The volume, from off (0) to full (16383, the
+    /// - Parameter volume: The volume, from off (0) to full (16,383, the
     ///                     default).
     ///
     /// - Returns:  The master volume message.
