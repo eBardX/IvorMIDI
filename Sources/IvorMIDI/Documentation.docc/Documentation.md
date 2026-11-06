@@ -18,12 +18,18 @@ wire encoding.
 
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
-whole control change sequence. Universal system exclusive messages for master
-volume, master tuning, and all of the MIDI Tuning Standard are built the same
-way, as are the bank select and program change messages that set a channel to
-a ``MIDIPatch``. ``MIDITuningMessage`` decodes MIDI Tuning Standard messages.
-A ``MIDIPitchBend`` can be made from a bend in cents and the synthesizer’s
-pitch bend sensitivity.
+whole control change sequence, and the bank select and program change messages
+that set a channel to a ``MIDIPatch`` are built the same way. A
+``MIDIPitchBend`` can be made from a bend in cents and the synthesizer’s pitch
+bend sensitivity.
+
+``MIDISysExEnvelope`` splits any system exclusive message into its owner and
+its payload. Typed messages build on it to encode and decode universal
+messages: ``MIDIDeviceControlMessage`` for master volume and tuning,
+``MIDIIdentityMessage`` for Identity Request and Identity Reply, and
+``MIDITuningMessage`` for all of the MIDI Tuning Standard. ``MIDITuningCodec``
+installs and reads tunings with the same code on any supported device, including
+the Yamaha TX81Z, which uses its own messages.
 
 ```swift
 import IvorMIDI
@@ -41,8 +47,8 @@ let decoded = MIDIChannelMessage(statusByte: 0x90,
 decoded == noteOn   // true
 ```
 
-See <doc:UsingIvorMIDI> for a full guide to the messages, the data values, and
-the wire encoding.
+See <doc:UsingIvorMIDI> for a full guide to the messages, the data values,
+devices, and the wire encoding.
 
 ## Topics
 
@@ -53,8 +59,17 @@ the wire encoding.
 ### Messages
 
 - ``MIDIChannelMessage``
+- ``MIDIDeviceControlMessage``
+- ``MIDIIdentityMessage``
 - ``MIDISystemMessage``
 - ``MIDITuningMessage``
+
+### System exclusive framing
+
+- ``MIDIManufacturerID``
+- ``MIDISysExEnvelope``
+- ``MIDISysExRepresentable``
+- ``MIDISysExUniversalID``
 
 ### Data values
 
@@ -62,6 +77,9 @@ the wire encoding.
 - ``MIDIController``
 - ``MIDIData1Value``
 - ``MIDIData2Value``
+- ``MIDIDeviceFamily``
+- ``MIDIDeviceIdentity``
+- ``MIDIDeviceMember``
 - ``MIDINonRegisteredParameter``
 - ``MIDIPitchBend``
 - ``MIDIProgram``
@@ -75,6 +93,23 @@ the wire encoding.
 
 - ``MIDIBank``
 - ``MIDIPatch``
+
+### Devices
+
+- <doc:TX81ZMicroTuning>
+- ``MIDIDevice``
+- ``MIDIDeviceAddress``
+- ``MIDIDeviceModel``
+- ``MIDIDeviceTuning``
+- ``MIDITuningCodec``
+- ``MIDITuningError``
+- ``MIDITuningLimits``
+- ``MIDITuningOutput``
+- ``MIDITuningPrerequisite``
+- ``MIDITuningSlot``
+- ``MIDIUniversalTuningCodec``
+- ``TX81ZTuningCodec``
+- ``TX81ZTuningPreset``
 
 ### Encoding
 

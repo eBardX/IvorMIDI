@@ -28,12 +28,17 @@ carry, can be converted to and from their [MIDI 1.0][midi1] wire encoding.
 
 Registered (RPN) and non-registered (NRPN) parameters, such as pitch bend
 sensitivity and fine tuning, can be set with a single call that builds the
-whole control change sequence. Universal system exclusive messages for master
-volume, master tuning, and all of the MIDI Tuning Standard are built the same
-way, as are the bank select and program change messages that set a channel to
-a `MIDIPatch`. `MIDITuningMessage` decodes MIDI Tuning Standard messages. A
-`MIDIPitchBend` can be made from a bend in cents and the synthesizer's pitch
-bend sensitivity.
+whole control change sequence, and the bank select and program change messages
+that set a channel to a `MIDIPatch` are built the same way. A `MIDIPitchBend`
+can be made from a bend in cents and the synthesizer's pitch bend sensitivity.
+
+`MIDISysExEnvelope` splits any system exclusive message into its owner and its
+payload. Typed messages build on it to encode and decode universal messages:
+`MIDIDeviceControlMessage` for master volume and tuning, `MIDIIdentityMessage`
+for Identity Request and Identity Reply, and `MIDITuningMessage` for all of the
+MIDI Tuning Standard. `MIDITuningCodec` installs and reads tunings with the same
+code on any supported device, including the Yamaha TX81Z, which uses its own
+messages.
 
 ## <a name="requirements">Requirements</a>
 
@@ -53,7 +58,7 @@ To add IvorMIDI to a Swift package, add it to the `dependencies` in your
 ```swift
 dependencies: [
     .package(url: "https://github.com/eBardX/IvorMIDI.git",
-             .upToNextMinor(from: "0.4.0"))
+             .upToNextMinor(from: "0.6.0"))
 ]
 ```
 
@@ -96,8 +101,8 @@ decoded == noteOn   // true
 ```
 
 For the complete story — the data values, the parameter and patch builders,
-universal system exclusive messages, MIDI tuning, and the wire encoding — see
-the [usage guide][guide].
+system exclusive messages, MIDI tuning, devices, and the wire encoding — see the
+[usage guide][guide].
 
 ## <a name="documentation">Documentation</a>
 
