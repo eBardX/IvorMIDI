@@ -20,7 +20,7 @@ extension TX81ZTuningSelectionTests {
 
     @Test
     func dataByte_order() {
-        // Octave, Full, then presets. Edisyn puts the presets first.
+        // Octave, Full, then presets, not presets first.
         #expect(TX81ZTuningSelection.table(.octave).dataByte == 0)
         #expect(TX81ZTuningSelection.table(.fullKeyboard).dataByte == 1)
         #expect(TX81ZTuningSelection.preset(.equal).dataByte == 2)

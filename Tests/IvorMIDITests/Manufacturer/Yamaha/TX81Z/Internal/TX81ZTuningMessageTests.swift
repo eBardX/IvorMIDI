@@ -40,7 +40,7 @@ extension TX81ZTuningMessageTests {
 
     @Test
     func decode_checksumOmittingTag() throws {
-        // Edisyn leaves the tag out of the checksum.
+        // The checksum must include the tag.
         var bytes = Fixtures.tx81z12TET
 
         bytes[272] = YamahaSysEx.checksum(bytes[16..<272])
@@ -57,7 +57,7 @@ extension TX81ZTuningMessageTests {
 
     @Test
     func decode_fullDumpSizedLikeOctave() throws {
-        // The p.69 misprint, also Edisyn’s bug.
+        // The p.69 misprint.
         var bytes = Fixtures.tx81z12TET
 
         bytes[4] = 0x00
